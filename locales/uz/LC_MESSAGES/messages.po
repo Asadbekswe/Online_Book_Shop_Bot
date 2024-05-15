@@ -1,0 +1,195 @@
+# Uzbek translations for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-05-15 00:14+0500\n"
+"PO-Revision-Date: 2024-05-14 23:01+0500\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: uz\n"
+"Language-Team: uz <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.13.1\n"
+
+#: bot/basket/__init__.py:20
+msgid "Jami: {all_sum} so'm"
+msgstr ""
+
+#: bot/basket/__init__.py:28
+msgid "Categoriyalardan birini tanlang 👇🏻"
+msgstr ""
+
+#: bot/basket/__init__.py:68
+msgid "Eng kamida 1 ta kitob buyurtma qilishingiz mumkin! 😊"
+msgstr ""
+
+#: bot/basket/__init__.py:80
+msgid "❌ Savatni tozalash"
+msgstr ""
+
+#: bot/basket/__init__.py:81
+msgid "✅ Buyurtmani tasdiqlash"
+msgstr ""
+
+#: bot/basket/__init__.py:82 bot/handlers/__init__.py:104
+msgid "◀️ orqaga"
+msgstr ""
+
+#: bot/handlers/__init__.py:18
+msgid "Assalomu alaykum! Tanlovingiz 👇🏻."
+msgstr ""
+
+#: bot/handlers/__init__.py:20
+msgid ""
+"Assalomu alaykum! \n"
+"Xush kelibsiz!"
+msgstr ""
+
+#: bot/handlers/__init__.py:29
+msgid ""
+"Buyruqlar:\n"
+"/start - Botni ishga tushirish\n"
+"/help - Yordam"
+msgstr ""
+
+#: bot/handlers/__init__.py:36
+msgid "Tilni tanlang: "
+msgstr ""
+
+#: bot/handlers/__init__.py:49
+msgid "Uzbek"
+msgstr ""
+
+#: bot/handlers/__init__.py:51
+msgid "Ingiliz"
+msgstr ""
+
+#: bot/handlers/__init__.py:53
+msgid "Turk"
+msgstr ""
+
+#: bot/handlers/__init__.py:54
+msgid "{lang} tili tanlandi"
+msgstr ""
+
+#: bot/handlers/__init__.py:55
+msgid "Assalomu alaykum! Tanlang."
+msgstr ""
+
+#: bot/handlers/__init__.py:66
+msgid "Kategoriyalardan birini tanlang"
+msgstr ""
+
+#: bot/handlers/__init__.py:71
+msgid "Categoriyalardan birini tanlang"
+msgstr ""
+
+#: bot/handlers/__init__.py:81
+msgid ""
+"\n"
+"\n"
+"\n"
+"\n"
+"Telegram: @Mexmonjonovuz\n"
+"\n"
+"📞  +{number}\n"
+"\n"
+"🤖 Bot Mexmonjonov Asadbek @Mexmonjonovuz tomonidan tayorlandi.\n"
+msgstr ""
+
+#: bot/keyboards/__init__.py:41
+msgid "🔍 Qidirish"
+msgstr ""
+
+#: bot/keyboards/__init__.py:54
+msgid "◀️Orqaga"
+msgstr ""
+
+#: bot/keyboards/__init__.py:55
+msgid "🛒 Savatga qo'shish"
+msgstr ""
+
+#: bot/keyboards/__init__.py:61
+msgid "📚 Kitoblar"
+msgstr ""
+
+#: bot/keyboards/__init__.py:62
+msgid "📃 Mening buyurtmalarim"
+msgstr ""
+
+#: bot/keyboards/__init__.py:63
+msgid "🔵 Biz ijtimoyi tarmoqlarda"
+msgstr ""
+
+#: bot/keyboards/__init__.py:64
+msgid "📞 Biz bilan bog'lanish"
+msgstr ""
+
+#: bot/keyboards/__init__.py:65
+msgid "🌐 Tilni almshtirish"
+msgstr ""
+
+#: bot/order/__init__.py:25
+msgid ""
+"🔢 Buyurtma raqami: <b>{name}</b>\n"
+"📆 Buyurtma qilingan sana: <b>{data_time}</b>\n"
+"🟣 Buyurtma holati: <b>{order_status}</b>\n"
+msgstr ""
+
+#: bot/order/__init__.py:52
+msgid "📞 Telefon raqam"
+msgstr ""
+
+#: bot/order/__init__.py:54
+msgid "Telefon raqamingizni qoldiring (📞 Telefon raqam tugmasini bosing)🔽:"
+msgstr ""
+
+#: bot/order/__init__.py:62
+msgid ""
+"\n"
+"Telefon raqamingiz: {contact}\n"
+"\n"
+"<i>Buyurtma berasizmi ?</i>"
+msgstr ""
+
+#: bot/order/__init__.py:65 bot/order/__init__.py:93
+msgid "❌ Yo'q"
+msgstr ""
+
+#: bot/order/__init__.py:66 bot/order/__init__.py:97
+msgid "✅ Ha"
+msgstr ""
+
+#: bot/order/__init__.py:73
+msgid "❌ Bekor qilindi"
+msgstr ""
+
+#: bot/order/__init__.py:74
+msgid "Asosiy menyu"
+msgstr ""
+
+#: bot/order/__init__.py:106
+msgid ""
+"✅ Hurmatli mijoz! Buyurtmangiz uchun tashakkur.\n"
+"Buyurtma raqami: {orders_num}"
+msgstr ""
+
+#: bot/order/__init__.py:120
+msgid "<i>🎉 Sizning {order_num} raqamli buyurtmangizni admin qabul qildi.</i>"
+msgstr ""
+
+#: bot/order/__init__.py:132
+msgid "🤷‍♂️ Sizda hali buyurtmalar mavjud emas. Yoki bekor qilingan"
+msgstr ""
+
+#: bot/order/__init__.py:136
+msgid "❌ bekor qilish"
+msgstr ""
+
