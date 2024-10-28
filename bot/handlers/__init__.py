@@ -16,11 +16,11 @@ main_router = Router()
 @main_router.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
     msg = _('Assalomu alaykum! Tanlovingiz 👇🏻.')
-    if message.from_user.id not in db['users']:
-        msg = _('Assalomu alaykum! \nXush kelibsiz!')
-        users = db['users']
-        users[str(message.from_user.id)] = True
-        db['users'] = users
+    # if message.from_user.id not in db['users']:
+    msg = _('Assalomu alaykum! \nXush kelibsiz!')
+    # users = db['users']
+    # users[str(message.from_user.id)] = True
+    # db['users'] = users
     await message.answer(text=msg, reply_markup=main_users_interface())
 
 
