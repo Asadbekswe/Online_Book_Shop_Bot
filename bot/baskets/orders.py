@@ -9,9 +9,9 @@ from aiogram.types import CallbackQuery, InlineKeyboardButton, ReplyKeyboardMark
 from aiogram.utils.i18n import gettext as _, lazy_gettext as __
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from bot.basket import to_category, basket_msg
+from bot.baskets import to_category, basket_msg
 from bot.configs import db, ADMIN_LIST
-from bot.keyboards import main_users_interface
+from bot.buttons import main_users_interface
 
 order_router = Router()
 
@@ -84,7 +84,7 @@ async def confirm_order(callback: CallbackQuery, bot: Bot):
     orders[str(callback.from_user.id)][str(orders['order_num'])] = {
         'date_time': str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
         'order_status': '🔄 kutish holatida',
-        'products': db['basket'][str(callback.from_user.id)],
+        'products': db['baskets'][str(callback.from_user.id)],
         'phone_number': callback.data[13:]
     }
     db['orders'] = orders

@@ -7,9 +7,8 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.utils.i18n import I18n, FSMI18nMiddleware
 
-from bot.commands import on_startup, on_shutdown
+from bot import on_startup, on_shutdown, BEGIN_router
 from bot.configs import TOKEN
-from bot.starter import BEGIN_router
 
 dp = Dispatcher()
 
