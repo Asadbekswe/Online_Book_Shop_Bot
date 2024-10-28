@@ -6,7 +6,7 @@ from aiogram.types import InlineKeyboardButton, Message, CallbackQuery
 from aiogram.utils.i18n import gettext as _, lazy_gettext as __
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from bot.config import db
+from bot.configs import db
 from bot.keyboards import show_category, make_plus_minus, main_users_interface, change_language_command, \
     social_media_keyboards
 

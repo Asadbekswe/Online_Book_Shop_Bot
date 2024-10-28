@@ -8,7 +8,7 @@ from aiogram.enums import ParseMode
 from aiogram.utils.i18n import I18n, FSMI18nMiddleware
 
 from bot.commands import on_startup, on_shutdown
-from bot.config import TOKEN
+from bot.configs import TOKEN
 from bot.starter import BEGIN_router
 
 dp = Dispatcher()

@@ -10,7 +10,7 @@ from aiogram.utils.i18n import gettext as _, lazy_gettext as __
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bot.basket import to_category, basket_msg
-from bot.config import db, ADMIN_LIST
+from bot.configs import db, ADMIN_LIST
 from bot.keyboards import main_users_interface
 
 order_router = Router()
