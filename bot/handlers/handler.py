@@ -21,6 +21,7 @@ async def command_start_handler(message: Message) -> None:
     # users = db['users']
     # users[str(message.from_user.id)] = True
     # db['users'] = users
+    print(message.from_user.id)
     await message.answer(text=msg, reply_markup=main_users_interface())
 
 
