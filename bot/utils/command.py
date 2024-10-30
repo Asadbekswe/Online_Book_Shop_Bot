@@ -1,7 +1,7 @@
 from aiogram import Dispatcher, Bot
 from aiogram.types import BotCommand
 
-from bot.configs import db
+from bot.config import db
 
 
 async def on_startup(dispatcher: Dispatcher, bot: Bot):

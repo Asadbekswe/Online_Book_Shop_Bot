@@ -1,7 +1,12 @@
+import os
+
+from dotenv import load_dotenv
 from redis_dict import RedisDict
 
-ADMIN_LIST = []  # admin ID
-TOKEN = "7846660611:AAHwswuQVcpyT_cQaVX3p5LOkneBzrZkXV4"  # TOKEN
+load_dotenv('.env')
+
+ADMIN_LIST = os.getenv('ADMIN_LIST')  # admin ID
+TOKEN = os.getenv('TOKEN')  # TOKEN
 db = RedisDict('all')
 
 print(db)

@@ -9,7 +9,7 @@ from aiogram.types import ReplyKeyboardRemove, Message, CallbackQuery, InlineKey
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bot.buttons import show_category, admins_for_interface
-from bot.configs import db
+from bot.config import db
 from bot.filters import ChatTypeFilter
 from bot.filters import IsAdmin
 from bot.utils import make_url
@@ -160,4 +160,10 @@ async def show_product(callback: CallbackQuery, state: FSMContext):
 
 @administrator_router.callback_query(F.text == 'Links')
 async def add_links(callback: CallbackQuery):
+    pass
+
+
+
+@administrator_router.callback_query(F.text == 'Admin')
+async def add_admins(callback: CallbackQuery):
     pass

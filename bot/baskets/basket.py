@@ -3,7 +3,7 @@ from aiogram.types import CallbackQuery, InlineKeyboardButton
 from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from bot.configs import db
+from bot.config import db
 from bot.buttons import show_category, make_plus_minus
 
 basket_router = Router()

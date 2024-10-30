@@ -8,7 +8,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bot.buttons import show_category, make_plus_minus, main, change_language_command, \
     social_media_keyboards
-from bot.configs import db
+from bot.config import db
 
 main_router = Router()
 users_storage = {'users': {}}

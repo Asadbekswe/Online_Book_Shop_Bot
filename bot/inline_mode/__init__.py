@@ -2,7 +2,7 @@ from aiogram import Router
 from aiogram.types import InlineQuery, InlineQueryResultArticle, \
     InputTextMessageContent
 
-from bot.configs import db
+from bot.config import db
 
 inline_router = Router()
 
