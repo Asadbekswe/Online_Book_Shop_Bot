@@ -156,3 +156,8 @@ async def show_product(callback: CallbackQuery, state: FSMContext):
     ikb.adjust(2, repeat=True)
     await callback.message.edit_text(db['categories'][callback.data], reply_markup=ikb.as_markup())
     await state.set_state(FormAdministrator.delete_product)
+
+
+@administrator_router.callback_query(F.text == 'Links')
+async def add_links(callback: CallbackQuery):
+    pass

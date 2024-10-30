@@ -36,9 +36,14 @@ def change_language_command():
 
 def show_category(user_id):
     ikb = InlineKeyboardBuilder()
+
+    if 'categories' not in db:
+        db['categories'] = {}
     for k, v in db['categories'].items():
         ikb.add(InlineKeyboardButton(text=v, callback_data=k))
     ikb.add(InlineKeyboardButton(text=_('🔍 Qidirish'), switch_inline_query_current_chat=''))
+    if 'baskets' not in db:
+        db['baskets'] = {}
     if str(user_id) in db['baskets']:
         ikb.add(InlineKeyboardButton(text=f'🛒 Savat ({len(db["baskets"][str(user_id)])})', callback_data='savat'))
     ikb.adjust(2, repeat=True)
@@ -56,7 +61,7 @@ def make_plus_minus(quantity, product_id):
     return ikb
 
 
-def main_users_interface(**kwargs):
+def main(**kwargs):
     rkb = ReplyKeyboardBuilder()
     rkb.add(KeyboardButton(text=_('📚 Kitoblar', **kwargs)))
     rkb.add(KeyboardButton(text=_('📃 Mening buyurtmalarim', **kwargs)))

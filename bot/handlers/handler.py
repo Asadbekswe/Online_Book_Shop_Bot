@@ -6,23 +6,24 @@ from aiogram.types import InlineKeyboardButton, Message, CallbackQuery
 from aiogram.utils.i18n import gettext as _, lazy_gettext as __
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from bot.buttons import show_category, make_plus_minus, main_users_interface, change_language_command, \
+from bot.buttons import show_category, make_plus_minus, main, change_language_command, \
     social_media_keyboards
 from bot.configs import db
 
 main_router = Router()
+users_storage = {'users': {}}
 
 
 @main_router.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
     msg = _('Assalomu alaykum! Tanlovingiz 👇🏻.')
-    # if message.from_user.id not in db['users']:
-    msg = _('Assalomu alaykum! \nXush kelibsiz!')
-    # users = db['users']
-    # users[str(message.from_user.id)] = True
-    # db['users'] = users
-    print(message.from_user.id)
-    await message.answer(text=msg, reply_markup=main_users_interface())
+    if 'users' not in db:
+        db['users'] = {}
+    if message.from_user.id not in db['users']:
+        msg = _('Assalomu alaykum! \nXush kelibsiz!')
+        db['users'][str(message.from_user.id)] = True
+        users_storage['users'][str(message.from_user.id)] = True
+    await message.answer(text=msg, reply_markup=main())
 
 
 @main_router.message(Command(commands='help'))
@@ -54,7 +55,7 @@ async def languages(callback: CallbackQuery, state: FSMContext) -> None:
         lang = _('Turk', locale=lang_code)
     await callback.answer(_('{lang} tili tanlandi', locale=lang_code).format(lang=lang))
     msg = _('Assalomu alaykum! Tanlang.', locale=lang_code)
-    await callback.message.answer(text=msg, reply_markup=main_users_interface(locale=lang_code))
+    await callback.message.answer(text=msg, reply_markup=main(locale=lang_code))
 
 
 @main_router.message(F.text == __("🔵 Biz ijtimoyi tarmoqlarda"))
