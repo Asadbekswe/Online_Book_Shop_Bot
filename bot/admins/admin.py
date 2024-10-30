@@ -8,10 +8,9 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import ReplyKeyboardRemove, Message, CallbackQuery, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from bot.buttons import show_category, admins_for_interface
+from bot.keyboards import show_category, admins_for_interface
 from bot.config import db
-from bot.filters import ChatTypeFilter
-from bot.filters import IsAdmin
+from bot.filters.is_admin import ChatTypeFilter,IsAdmin
 from bot.utils import make_url
 
 administrator_router = Router()
