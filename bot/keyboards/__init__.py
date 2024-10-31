@@ -3,13 +3,13 @@ from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 from bot.config import db
-from bot.config.conf import SOCIAL_LINKS, SOCIAL_TEXT_BUTTONS
+from bot.config.conf import LINKS
 
 
 def social_media_keyboards() -> InlineKeyboardMarkup:
     ikb = InlineKeyboardBuilder()
-    for i in range(max(len(SOCIAL_LINKS), len(SOCIAL_TEXT_BUTTONS))):
-        ikb.add(InlineKeyboardButton(text=SOCIAL_TEXT_BUTTONS[i], url=SOCIAL_LINKS[i]))
+    for i in LINKS.keys():
+        ikb.add(InlineKeyboardButton(text=i, url=LINKS[i]))
     ikb.adjust(1, repeat=True)
     return ikb.as_markup()
 
@@ -18,8 +18,7 @@ def admins_for_interface() -> ReplyKeyboardMarkup:
     rkb = ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text='Product+'), KeyboardButton(text='Category+')],
                   [KeyboardButton(text='delete product'), KeyboardButton(text='delete category')],
-                  [KeyboardButton(text='📚 Kitoblar')]
-                  ],
+                  [KeyboardButton(text='📚 Kitoblar'), KeyboardButton(text='Links')]],
         resize_keyboard=True)
     return rkb
 

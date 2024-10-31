@@ -13,7 +13,6 @@ from bot.filters.is_admin import ChatTypeFilter, IsAdmin
 from bot.keyboards import show_category, admins_for_interface
 from bot.utils.uploader import make_url
 
-
 administrator_router = Router()
 administrator_router.message.filter(ChatTypeFilter([ChatType.PRIVATE]), IsAdmin())
 
@@ -158,9 +157,9 @@ async def show_product(callback: CallbackQuery, state: FSMContext):
     await state.set_state(FormAdministrator.delete_product)
 
 
-@administrator_router.callback_query(F.text == 'Links')
-async def add_links(callback: CallbackQuery):
-    pass
+@administrator_router.message(F.text == 'Links')
+async def add_links(message: Message, state: FSMContext):
+    await message.answer('Hello World')
 
 
 @administrator_router.callback_query(F.text == 'Admin')
