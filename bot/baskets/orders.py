@@ -11,7 +11,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bot.baskets import to_category, basket_msg
 from bot.config import db, ADMIN_LIST
-from bot.keyboards import main
+from bot.keyboards import main_buttons
 
 order_router = Router()
 
@@ -71,7 +71,7 @@ async def phone_number(message: Message):
 async def canceled_order(callback: CallbackQuery):
     await callback.message.delete()
     await callback.message.answer(_('❌ Bekor qilindi'))
-    await callback.message.answer(_('Asosiy menyu'), reply_markup=main())
+    await callback.message.answer(_('Asosiy menyu'), reply_markup=main_buttons())
 
 
 @order_router.callback_query(F.data.startswith('confirm_order'))
@@ -105,7 +105,7 @@ async def confirm_order(callback: CallbackQuery, bot: Bot):
     await callback.message.answer(
         _('✅ Hurmatli mijoz! Buyurtmangiz uchun tashakkur.\nBuyurtma raqami: {orders_num}').format(
             orders_num=orders["order_num"]),
-        reply_markup=main())
+        reply_markup=main_buttons())
     clear_users_basket(callback.from_user.id)
 
 

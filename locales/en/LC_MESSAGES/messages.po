@@ -194,7 +194,7 @@ msgstr "❌ Cancel"
 
 #: bot/order/__init__.py:74
 msgid "Asosiy menyu"
-msgstr "Main Menu"
+msgstr "main_buttons Menu"
 
 #: bot/order/__init__.py:106
 msgid ""

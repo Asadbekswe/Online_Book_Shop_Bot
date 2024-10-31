@@ -3,9 +3,7 @@ from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 from bot.config import db
-
-SOCIAL_LINKS = ['https://t.me/ikar_factor', 'https://t.me/factor_books', 'https://t.me/factorbooks']
-SOCIAL_TEXT_BUTTONS = ['IKAR | Factor Books', 'Factor Books', '\"Factor Books\" nashiryoti']
+from bot.config.conf import SOCIAL_LINKS, SOCIAL_TEXT_BUTTONS
 
 
 def social_media_keyboards() -> InlineKeyboardMarkup:
@@ -61,12 +59,12 @@ def make_plus_minus(quantity, product_id):
     return ikb
 
 
-def main(**kwargs):
+def main_buttons(**kwargs):
     rkb = ReplyKeyboardBuilder()
     rkb.add(KeyboardButton(text=_('📚 Kitoblar', **kwargs)))
     rkb.add(KeyboardButton(text=_('📃 Mening buyurtmalarim', **kwargs)))
     rkb.add(KeyboardButton(text=_("🔵 Biz ijtimoyi tarmoqlarda", **kwargs)))
     rkb.add(KeyboardButton(text=_('📞 Biz bilan bog\'lanish', **kwargs)))
     rkb.add(KeyboardButton(text=_('🌐 Tilni almshtirish', **kwargs)))
-    rkb.adjust(1,1,2,repeat=True)
+    rkb.adjust(1, 1, 2, repeat=True)
     return rkb.as_markup(resize_keyboard=True)

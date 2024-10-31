@@ -16,7 +16,7 @@ from bot.utils.starter import BEGIN_router
 dp = Dispatcher()
 
 
-async def main() -> None:
+async def main_buttons() -> None:
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     i18n = I18n(path='locales')
     dp.update.outer_middleware.register(FSMI18nMiddleware(i18n))
@@ -26,6 +26,6 @@ async def main() -> None:
     await dp.start_polling(bot)
 
 
-if __name__ == "__main__":
+if __name__ == "__main_buttons__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-    asyncio.run(main())
+    asyncio.run(main_buttons())
