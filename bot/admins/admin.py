@@ -30,8 +30,10 @@ class FormAdministrator(StatesGroup):
     product_category = State()
     category = State()
     see_category = State()
-    delete_product = State()
-    delete_category = State()
+    product_delete = State()
+    category_delete = State()
+    link_name = State()
+    link_url = State()
 
 
 storage = {}
@@ -107,14 +109,14 @@ async def add_category(message: Message, state: FSMContext) -> None:
 
 
 @administrator_router.message(F.text == 'delete product')
-async def delete_category(message: Message, state: FSMContext) -> None:
+async def category_delete(message: Message, state: FSMContext) -> None:
     await message.answer('Tanlang', reply_markup=ReplyKeyboardRemove())
     await message.reply('👇🏻', reply_markup=show_category(message.from_user.id))
     await state.set_state(FormAdministrator.see_category)
 
 
-@administrator_router.callback_query(FormAdministrator.delete_product)
-async def delete_product(callback: CallbackQuery, state: FSMContext):
+@administrator_router.callback_query(FormAdministrator.product_delete)
+async def product_delete(callback: CallbackQuery, state: FSMContext):
     products = db['products']
     products.pop(callback.data)
     db['products'] = products
@@ -124,14 +126,14 @@ async def delete_product(callback: CallbackQuery, state: FSMContext):
 
 
 @administrator_router.message(F.text == 'Delete category')
-async def delete_category(message: Message, state: FSMContext) -> None:
+async def category_delete(message: Message, state: FSMContext) -> None:
     await message.answer('Tanlang', reply_markup=ReplyKeyboardRemove())
     await message.reply('👇🏻', reply_markup=show_category(message.from_user.id))
-    await state.set_state(FormAdministrator.delete_category)
+    await state.set_state(FormAdministrator.category_delete)
 
 
-@administrator_router.callback_query(FormAdministrator.delete_category)
-async def delete_category(callback: CallbackQuery, state: FSMContext) -> None:
+@administrator_router.callback_query(FormAdministrator.category_delete)
+async def category_delete(callback: CallbackQuery, state: FSMContext) -> None:
     new_products = {}
     for key, val in db['products'].items():
         if val['category_id'] != callback.data:
@@ -154,12 +156,19 @@ async def show_product(callback: CallbackQuery, state: FSMContext):
             ikb.add(InlineKeyboardButton(text=val['name'], callback_data=key))
     ikb.adjust(2, repeat=True)
     await callback.message.edit_text(db['categories'][callback.data], reply_markup=ikb.as_markup())
-    await state.set_state(FormAdministrator.delete_product)
+    await state.set_state(FormAdministrator.product_delete)
 
 
 @administrator_router.message(F.text == 'Links')
 async def add_links(message: Message, state: FSMContext):
-    await message.answer('Hello World')
+    await state.set_state(FormAdministrator.link_name)
+    await message.answer(text='Link Nomi')
+
+
+@administrator_router.message(F.text == 'Links')
+async def add_links(message: Message, state: FSMContext):
+    await state.set_state(FormAdministrator.link_url)
+    await message.answer(text='Link uchun url')
 
 
 @administrator_router.callback_query(F.text == 'Admin')
