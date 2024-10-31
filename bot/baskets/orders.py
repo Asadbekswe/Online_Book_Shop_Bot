@@ -126,15 +126,31 @@ async def order_accept_canceled(callback: CallbackQuery, bot: Bot):
     db['orders'] = orders
 
 
+#
+# @order_router.message(F.text == __('📃 Mening buyurtmalarim'))
+# async def my_orders(message: Message):
+#     if str(message.from_user.id) not in db['orders'] or not db['orders'][str(message.from_user.id)]:
+#         await message.answer(_('🤷‍♂️ Sizda hali buyurtmalar mavjud emas. Yoki bekor qilingan'))
+#     else:
+#         for order in db['orders'][str(message.from_user.id)].keys():
+#             ikb = InlineKeyboardMarkup(inline_keyboard=[
+#                 [InlineKeyboardButton(text=_('❌ bekor qilish'), callback_data='from_user_canceled_order' + order)]])
+#             await message.answer(order_msg(message.from_user.id, order), reply_markup=ikb)
+
 @order_router.message(F.text == __('📃 Mening buyurtmalarim'))
 async def my_orders(message: Message):
-    if str(message.from_user.id) not in db['orders'] or not db['orders'][str(message.from_user.id)]:
+    user_id = str(message.from_user.id)
+    if 'orders' not in db:
+        db['orders'] = {}
+    if user_id not in db['orders'] or not db['orders'][user_id]:
         await message.answer(_('🤷‍♂️ Sizda hali buyurtmalar mavjud emas. Yoki bekor qilingan'))
     else:
-        for order in db['orders'][str(message.from_user.id)].keys():
+        for order in db['orders'][user_id].keys():
             ikb = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text=_('❌ bekor qilish'), callback_data='from_user_canceled_order' + order)]])
-            await message.answer(order_msg(message.from_user.id, order), reply_markup=ikb)
+                [InlineKeyboardButton(text=_('❌ bekor qilish'), callback_data='from_user_canceled_order' + order)]
+            ])
+
+            await message.answer(order_msg(user_id, order), reply_markup=ikb)
 
 
 @order_router.callback_query(F.data.startswith('from_user_canceled_order'))

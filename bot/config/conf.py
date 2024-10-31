@@ -5,10 +5,9 @@ from redis_dict import RedisDict
 
 load_dotenv('.env')
 
-ADMIN_LIST = os.getenv('ADMIN_LIST')  # admin ID
+ADMIN_LIST = []  # [os.getenv('ADMIN_LIST')]  # admin ID
 TOKEN = os.getenv('TOKEN')  # TOKEN
 db = RedisDict('all')
-
 print(db)
 
 # 5684649553

@@ -8,10 +8,11 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import ReplyKeyboardRemove, Message, CallbackQuery, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from bot.keyboards import show_category, admins_for_interface
 from bot.config import db
-from bot.filters.is_admin import ChatTypeFilter,IsAdmin
-from bot.utils import make_url
+from bot.filters.is_admin import ChatTypeFilter, IsAdmin
+from bot.keyboards import show_category, admins_for_interface
+from bot.utils.uploader import make_url
+
 
 administrator_router = Router()
 administrator_router.message.filter(ChatTypeFilter([ChatType.PRIVATE]), IsAdmin())
@@ -160,7 +161,6 @@ async def show_product(callback: CallbackQuery, state: FSMContext):
 @administrator_router.callback_query(F.text == 'Links')
 async def add_links(callback: CallbackQuery):
     pass
-
 
 
 @administrator_router.callback_query(F.text == 'Admin')
