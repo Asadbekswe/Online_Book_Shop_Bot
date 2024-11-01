@@ -47,13 +47,15 @@ async def language_handler(message: Message) -> None:
 async def languages(callback: CallbackQuery, state: FSMContext) -> None:
     lang_code = callback.data.split('lang_')[-1]
     await state.update_data(locale=lang_code)
-    if lang_code == 'uz':
-        lang = _('Uzbek', locale=lang_code)
-    elif lang_code == 'en':
-        lang = _('Ingiliz', locale=lang_code)
-    elif lang_code == "tur":
-        lang = _('Turk', locale=lang_code)
-    await callback.answer(_('{lang} tili tanlandi', locale=lang_code).format(lang=lang))
+    lang_map = {
+        'uz': _('Uzbek', locale=lang_code),
+        'en': _('English', locale=lang_code),
+        'tur': _('Turk', locale=lang_code),
+        'ru': _('Rus', locale=lang_code),
+        'ko': _('Korean', locale=lang_code),
+    }
+    current_lang = lang_map.get(lang_code, _('Til', locale=lang_code))
+    await callback.answer(_('{lang} tili tanlandi', locale=lang_code).format(lang=current_lang))
     msg = _('Assalomu alaykum! Tanlang.', locale=lang_code)
     await callback.message.answer(text=msg, reply_markup=main_buttons(locale=lang_code))
 
