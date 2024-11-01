@@ -9,9 +9,7 @@ from aiogram.utils.i18n import I18n, FSMI18nMiddleware
 
 from bot.config import TOKEN
 from bot.handlers.commands import on_startup, on_shutdown
-from bot.utils.starter import BEGIN_router
-
-# from bot.utils import BEGIN_router
+from bot.utils.starter import router
 
 dp = Dispatcher()
 
@@ -22,7 +20,7 @@ async def main_buttons() -> None:
     dp.update.outer_middleware.register(FSMI18nMiddleware(i18n))
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
-    dp.include_router(BEGIN_router)
+    dp.include_router(router)
     await dp.start_polling(bot)
 
 

@@ -1,1 +1,1 @@
-from bot.admins.admin import administrator_router
+from bot.admins.admin import admin_router

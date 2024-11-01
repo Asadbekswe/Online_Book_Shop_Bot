@@ -10,11 +10,11 @@ from bot.config import db
 from bot.keyboards import show_category, make_plus_minus, main_buttons, lang_commands, \
     main_links_buttons
 
-main_buttons_router = Router()
+main_router = Router()
 users_storage = {'users': {}}
 
 
-@main_buttons_router.message(CommandStart())
+@main_router.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
     msg = _('Assalomu alaykum! Tanlovingiz 👇🏻.')
     if 'users' not in db:
@@ -26,24 +26,24 @@ async def command_start_handler(message: Message) -> None:
     await message.answer(text=msg, reply_markup=main_buttons())
 
 
-@main_buttons_router.message(Command(commands='help'))
+@main_router.message(Command(commands='help'))
 async def help_command(message: Message) -> None:
     await message.answer(_('''Buyruqlar:
 /start - Botni ishga tushirish
 /help - Yordam'''))
 
 
-@main_buttons_router.message(F.text == __('🌐 Tilni almshtirish'))
+@main_router.message(F.text == __('🌐 Tilni almshtirish'))
 async def change_language(message: Message) -> None:
     await message.answer(_('Tilni tanlang: '), reply_markup=lang_commands())
 
 
-@main_buttons_router.message(Command(commands=['language']))
+@main_router.message(Command(commands=['language']))
 async def language_handler(message: Message) -> None:
     await change_language(message)
 
 
-@main_buttons_router.callback_query(F.data.startswith('lang_'))
+@main_router.callback_query(F.data.startswith('lang_'))
 async def languages(callback: CallbackQuery, state: FSMContext) -> None:
     lang_code = callback.data.split('lang_')[-1]
     await state.update_data(locale=lang_code)
@@ -58,23 +58,23 @@ async def languages(callback: CallbackQuery, state: FSMContext) -> None:
     await callback.message.answer(text=msg, reply_markup=main_buttons(locale=lang_code))
 
 
-@main_buttons_router.message(F.text == __("🔵 Biz ijtimoyi tarmoqlarda"))
+@main_router.message(F.text == __("🔵 Biz ijtimoyi tarmoqlarda"))
 async def our_social_network(message: Message) -> None:
     await message.answer('Biz ijtimoiy tarmoqlarda', reply_markup=main_links_buttons())
 
 
-@main_buttons_router.message(F.text == __('📚 Kitoblar'))
+@main_router.message(F.text == __('📚 Kitoblar'))
 async def books(message: Message) -> None:
     await message.answer(_('Kategoriyalardan birini tanlang'), reply_markup=show_category(message.from_user.id))
 
 
-@main_buttons_router.callback_query(F.data.startswith('orqaga'))
+@main_router.callback_query(F.data.startswith('orqaga'))
 async def back_handler(callback: CallbackQuery):
     await callback.message.edit_text(_('Categoriyalardan birini tanlang'),
                                      reply_markup=show_category(callback.from_user.id))
 
 
-@main_buttons_router.message(F.text == __("📞 Biz bilan bog'lanish"))
+@main_router.message(F.text == __("📞 Biz bilan bog'lanish"))
 async def message(message: Message) -> None:
     text = _("""\n
 \n
@@ -84,7 +84,7 @@ Telegram: @Mexmonjonovuz\n
     await message.answer(text=text, parse_mode=ParseMode.HTML)
 
 
-@main_buttons_router.message(lambda msg: msg.text[-36:] in db['products'])
+@main_router.message(lambda msg: msg.text[-36:] in db['products'])
 async def answer_inline_query(message: Message):
     msg = message.text[-36:]
     product = db['products'][msg]
@@ -93,7 +93,7 @@ async def answer_inline_query(message: Message):
     await message.answer_photo(photo=product['image'], caption=product['text'], reply_markup=ikb.as_markup())
 
 
-@main_buttons_router.callback_query()
+@main_router.callback_query()
 async def product_handler(callback: CallbackQuery):
     if callback.data in db['categories']:
         ikb = InlineKeyboardBuilder()
