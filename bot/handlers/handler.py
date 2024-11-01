@@ -7,8 +7,8 @@ from aiogram.utils.i18n import gettext as _, lazy_gettext as __
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bot.config import db
-from bot.keyboards import show_category, make_plus_minus, main_buttons, change_language_command, \
-    social_media_keyboards
+from bot.keyboards import show_category, make_plus_minus, main_buttons, lang_commands, \
+    main_links_buttons
 
 main_buttons_router = Router()
 users_storage = {'users': {}}
@@ -35,7 +35,7 @@ async def help_command(message: Message) -> None:
 
 @main_buttons_router.message(F.text == __('🌐 Tilni almshtirish'))
 async def change_language(message: Message) -> None:
-    await message.answer(_('Tilni tanlang: '), reply_markup=change_language_command())
+    await message.answer(_('Tilni tanlang: '), reply_markup=lang_commands())
 
 
 @main_buttons_router.message(Command(commands=['language']))
@@ -60,7 +60,7 @@ async def languages(callback: CallbackQuery, state: FSMContext) -> None:
 
 @main_buttons_router.message(F.text == __("🔵 Biz ijtimoyi tarmoqlarda"))
 async def our_social_network(message: Message) -> None:
-    await message.answer('Biz ijtimoiy tarmoqlarda', reply_markup=social_media_keyboards())
+    await message.answer('Biz ijtimoiy tarmoqlarda', reply_markup=main_links_buttons())
 
 
 @main_buttons_router.message(F.text == __('📚 Kitoblar'))

@@ -6,7 +6,7 @@ from bot.config import db
 from bot.config.conf import LINKS
 
 
-def social_media_keyboards() -> InlineKeyboardMarkup:
+def main_links_buttons() -> InlineKeyboardMarkup:
     ikb = InlineKeyboardBuilder()
     for i in LINKS.keys():
         ikb.add(InlineKeyboardButton(text=i, url=LINKS[i]))
@@ -14,16 +14,16 @@ def social_media_keyboards() -> InlineKeyboardMarkup:
     return ikb.as_markup()
 
 
-def admins_for_interface() -> ReplyKeyboardMarkup:
+def admin_buttons() -> ReplyKeyboardMarkup:
     rkb = ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text='Product+'), KeyboardButton(text='Category+')],
                   [KeyboardButton(text='delete product'), KeyboardButton(text='delete category')],
-                  [KeyboardButton(text='📚 Kitoblar'), KeyboardButton(text='Links')]],
+                  [KeyboardButton(text='📚 Kitoblar')]],
         resize_keyboard=True)
     return rkb
 
 
-def change_language_command():
+def lang_commands():
     ikb = InlineKeyboardBuilder()
     ikb.row(InlineKeyboardButton(text='Uz🇺🇿', callback_data='lang_uz'),
             InlineKeyboardButton(text='En🇬🇧', callback_data='lang_en'),

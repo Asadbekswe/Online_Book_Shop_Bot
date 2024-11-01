@@ -10,7 +10,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bot.config import db
 from bot.filters.is_admin import ChatTypeFilter, IsAdmin
-from bot.keyboards import show_category, admins_for_interface
+from bot.keyboards import show_category, admin_buttons
 from bot.utils.uploader import make_url
 
 administrator_router = Router()
@@ -19,7 +19,7 @@ administrator_router.message.filter(ChatTypeFilter([ChatType.PRIVATE]), IsAdmin(
 
 @administrator_router.message(CommandStart())
 async def start_for_admin(message: Message):
-    await message.answer('Tanlovingiz ❕', reply_markup=admins_for_interface())
+    await message.answer('Tanlovingiz ❕', reply_markup=admin_buttons())
 
 
 class FormAdministrator(StatesGroup):
@@ -32,8 +32,6 @@ class FormAdministrator(StatesGroup):
     see_category = State()
     product_delete = State()
     category_delete = State()
-    link_name = State()
-    link_url = State()
 
 
 storage = {}
@@ -90,7 +88,7 @@ async def add_product(callback: CallbackQuery, state: FSMContext):
     db['products'] = product
     await state.clear()
     await callback.message.delete()
-    await callback.message.answer('Saqlandi ✅', reply_markup=admins_for_interface())
+    await callback.message.answer('Saqlandi ✅', reply_markup=admin_buttons())
 
 
 @administrator_router.message(F.text == 'Category+')
@@ -105,7 +103,7 @@ async def add_category(message: Message, state: FSMContext) -> None:
     category[str(uuid4())] = message.text
     db['categories'] = category
     await state.clear()
-    await message.answer("Catgory Bazaga Saqlandi ✅", reply_markup=admins_for_interface())
+    await message.answer("Catgory Bazaga Saqlandi ✅", reply_markup=admin_buttons())
 
 
 @administrator_router.message(F.text == 'delete product')
@@ -122,7 +120,7 @@ async def product_delete(callback: CallbackQuery, state: FSMContext):
     db['products'] = products
     await state.clear()
     await callback.message.delete()
-    await callback.message.answer('Product deleted ✅', reply_markup=admins_for_interface())
+    await callback.message.answer('Product deleted ✅', reply_markup=admin_buttons())
 
 
 @administrator_router.message(F.text == 'Delete category')
@@ -145,7 +143,7 @@ async def category_delete(callback: CallbackQuery, state: FSMContext) -> None:
     await state.clear()
     await callback.message.delete()
     await callback.message.answer(text="Categoryga tegishli bo'lgan product va category o'chirildi ✅",
-                                  reply_markup=admins_for_interface())
+                                  reply_markup=admin_buttons())
 
 
 @administrator_router.callback_query(FormAdministrator.see_category)
@@ -157,20 +155,3 @@ async def show_product(callback: CallbackQuery, state: FSMContext):
     ikb.adjust(2, repeat=True)
     await callback.message.edit_text(db['categories'][callback.data], reply_markup=ikb.as_markup())
     await state.set_state(FormAdministrator.product_delete)
-
-
-@administrator_router.message(F.text == 'Links')
-async def add_links(message: Message, state: FSMContext):
-    await state.set_state(FormAdministrator.link_name)
-    await message.answer(text='Link Nomi')
-
-
-@administrator_router.message(F.text == 'Links')
-async def add_links(message: Message, state: FSMContext):
-    await state.set_state(FormAdministrator.link_url)
-    await message.answer(text='Link uchun url')
-
-
-@administrator_router.callback_query(F.text == 'Admin')
-async def add_admins(callback: CallbackQuery):
-    pass
