@@ -99,9 +99,9 @@ async def answer_inline_query(message: Message):
 async def product_handler(callback: CallbackQuery):
     if callback.data in db['categories']:
         ikb = InlineKeyboardBuilder()
-        for k, val in db['products'].items():
+        for key, val in db['products'].items():
             if val['category_id'] == callback.data:
-                ikb.add(InlineKeyboardButton(text=val['name'], callback_data=k))
+                ikb.add(InlineKeyboardButton(text=val['name'], callback_data=key))
         if str(callback.from_user.id) in db['baskets']:
             ikb.add(InlineKeyboardButton(text=f'🛒 Savat ({len(db["baskets"][str(callback.from_user.id)])})',
                                          callback_data='savat'))
