@@ -1,0 +1,218 @@
+# Russian translations for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-05-15 00:14+0500\n"
+"PO-Revision-Date: 2024-11-02 00:36+0500\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.13.1\n"
+
+#: bot/basket/__init__.py:20
+msgid "Jami: {all_sum} so'm"
+msgstr "Итого: {all_sum} сум"
+
+#: bot/basket/__init__.py:28
+msgid "Categoriyalardan birini tanlang 👇🏻"
+msgstr "Выбирайте одну из категорий 👇🏻"
+
+#: bot/basket/__init__.py:68
+msgid "Eng kamida 1 ta kitob buyurtma qilishingiz mumkin! 😊"
+msgstr "Вы можете заказать минимум 1 книгу! 😊"
+
+#: bot/basket/__init__.py:80
+msgid "❌ Savatni tozalash"
+msgstr "❌Чистка корзины"
+
+#: bot/basket/__init__.py:81
+msgid "✅ Buyurtmani tasdiqlash"
+msgstr "✅ Подтверждение заказа"
+
+#: bot/basket/__init__.py:82 bot/handlers/__init__.py:104
+msgid "◀️ orqaga"
+msgstr "◀️ назад"
+
+#: bot/handlers/__init__.py:18
+msgid "Assalomu alaykum! Tanlovingiz 👇🏻."
+msgstr "Привет! Ваш выбор 👇🏻."
+
+#: bot/handlers/__init__.py:20
+msgid ""
+"Assalomu alaykum! \n"
+"Xush kelibsiz!"
+msgstr ""
+"Привет! \n"
+"Добро пожаловать!"
+
+#: bot/handlers/__init__.py:29
+msgid ""
+"Buyruqlar:\n"
+"/start - Botni ishga tushirish\n"
+"/help - Yordam"
+msgstr ""
+"Команды:\n"
+"/start - Запустить бота\n"
+"/help - Помощь"
+
+#: bot/handlers/__init__.py:36
+msgid "Tilni tanlang: "
+msgstr "Выберите язык:"
+
+#: bot/handlers/__init__.py:49
+msgid "Uzbek"
+msgstr "Узбекский"
+
+#: bot/handlers/__init__.py:51
+msgid "Ingiliz"
+msgstr "Английский"
+
+#: bot/handlers/__init__.py:53
+msgid "Turk"
+msgstr "турок"
+
+#: bot/handlers/__init__.py:54
+msgid "{lang} tili tanlandi"
+msgstr "Язык {lang} выбран"
+
+#: bot/handlers/__init__.py:55
+msgid "Assalomu alaykum! Tanlang."
+msgstr "Привет! Выбирать."
+
+#: bot/handlers/__init__.py:66
+msgid "Kategoriyalardan birini tanlang"
+msgstr "Выберите одну из категорий"
+
+#: bot/handlers/__init__.py:71
+msgid "Categoriyalardan birini tanlang"
+msgstr "Выберите одну из категорий"
+
+#: bot/handlers/__init__.py:81
+msgid ""
+"\n"
+"\n"
+"\n"
+"\n"
+"Telegram: @Mexmonjonovuz\n"
+"\n"
+"📞  +{number}\n"
+"\n"
+"🤖 Bot Mexmonjonov Asadbek @Mexmonjonovuz tomonidan tayorlandi.\n"
+msgstr ""
+"\n"
+"\n"
+"\n"
+"\n"
+"Телеграмма: @Mexmonjonovuz\n"
+"\n"
+"📞 +{номер}\n"
+"\n"
+"🤖 Бота Мехмонжонов подготовил Асадбек @Mekmonjonovuz.\n"
+
+#: bot/keyboards/__init__.py:41
+msgid "🔍 Qidirish"
+msgstr "🔍 Поиск"
+
+#: bot/keyboards/__init__.py:54
+msgid "◀️Orqaga"
+msgstr "◀️Назад"
+
+#: bot/keyboards/__init__.py:55
+msgid "🛒 Savatga qo'shish"
+msgstr "🛒 В корзину"
+
+#: bot/keyboards/__init__.py:61
+msgid "📚 Kitoblar"
+msgstr "📚 Книги"
+
+#: bot/keyboards/__init__.py:62
+msgid "📃 Mening buyurtmalarim"
+msgstr "📃 Мои заказы"
+
+#: bot/keyboards/__init__.py:63
+msgid "🔵 Biz ijtimoyi tarmoqlarda"
+msgstr "🔵 Мы есть в социальных сетях"
+
+#: bot/keyboards/__init__.py:64
+msgid "📞 Biz bilan bog'lanish"
+msgstr "📞 Свяжитесь с нами"
+
+#: bot/keyboards/__init__.py:65
+msgid "🌐 Tilni almshtirish"
+msgstr "🌐 Изменить язык"
+
+#: bot/order/__init__.py:25
+msgid ""
+"🔢 Buyurtma raqami: <b>{name}</b>\n"
+"📆 Buyurtma qilingan sana: <b>{data_time}</b>\n"
+"🟣 Buyurtma holati: <b>{order_status}</b>\n"
+msgstr ""
+"🔢 Номер заказа: <b>{name}</b>\n"
+"📆 Дата заказа: <b>{data_time</b>\n"
+"🟣 Статус заказа: <b>{order_status</b>\n"
+
+#: bot/order/__init__.py:52
+msgid "📞 Telefon raqam"
+msgstr "📞 Номер телефона"
+
+#: bot/order/__init__.py:54
+msgid "Telefon raqamingizni qoldiring (📞 Telefon raqam tugmasini bosing)🔽:"
+msgstr "Оставьте свой номер телефона (нажмите кнопку 📞 Номер телефона)🔽:"
+
+#: bot/order/__init__.py:62
+msgid ""
+"\n"
+"Telefon raqamingiz: {contact}\n"
+"\n"
+"<i>Buyurtma berasizmi ?</i>"
+msgstr ""
+"\n"
+"«Ваш номер телефона: {contact}\n»"
+"\n"
+"<i>Заказать?</i>"
+
+#: bot/order/__init__.py:65 bot/order/__init__.py:93
+msgid "❌ Yo'q"
+msgstr "❌ Нет"
+
+#: bot/order/__init__.py:66 bot/order/__init__.py:97
+msgid "✅ Ha"
+msgstr "✅ Да"
+
+#: bot/order/__init__.py:73
+msgid "❌ Bekor qilindi"
+msgstr "❌ Отменено"
+
+#: bot/order/__init__.py:74
+msgid "Asosiy menyu"
+msgstr "Главное меню"
+
+#: bot/order/__init__.py:106
+msgid ""
+"✅ Hurmatli mijoz! Buyurtmangiz uchun tashakkur.\n"
+"Buyurtma raqami: {orders_num}"
+msgstr ""
+" ✅ Уважаемый покупатель! Спасибо за заказ.\n"
+"Номер заказа: {orders_num}"
+#: bot/order/__init__.py:120
+msgid "<i>🎉 Sizning {order_num} raqamli buyurtmangizni admin qabul qildi.</i>"
+msgstr "<i>🎉 Ваш цифровой заказ {order_num} принят администратором.</i>"
+
+#: bot/order/__init__.py:132
+msgid "🤷‍♂️ Sizda hali buyurtmalar mavjud emas. Yoki bekor qilingan"
+msgstr "🤷‍♂️ У вас пока нет заказов. Или отменено"
+
+#: bot/order/__init__.py:136
+msgid "❌ bekor qilish"
+msgstr "❌ отмена"
+
