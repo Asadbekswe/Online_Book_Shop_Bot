@@ -14,7 +14,7 @@ def basket_msg(user_id):
     msg = f'🛒 Savat \n\n'
     all_sum = 0
     for key, val in enumerate(basket_of_user.values()):
-        summa = val['quantity'] * float(val['price'])
+        summa = float(val['quantity']) * float(val['price'])
         msg += f'{key + 1}. {val["product_name"]} \n{val["quantity"]} x {val["price"]} = {str(summa)} so\'m\n\n'
         all_sum += summa
     msg += _("Jami: {all_sum} so\'m").format(all_sum=all_sum)
