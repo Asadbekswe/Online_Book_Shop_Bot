@@ -11,18 +11,18 @@ from bot.keyboards import show_category, make_plus_minus, main_buttons, lang_com
     main_links_buttons
 
 main_router = Router()
-users_storage = {'users': {}}
 
 
 @main_router.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
     msg = _('Assalomu alaykum! Tanlovingiz 👇🏻.')
-    if 'users' not in db:
-        db['users'] = {}
     if message.from_user.id not in db['users']:
+        db['users'][str(message.from_user.id)] = {
+            'first_name': message.from_user.first_name,
+            'last_name': message.from_user.last_name,
+        }
         msg = _('Assalomu alaykum! \nXush kelibsiz!')
-        db['users'][str(message.from_user.id)] = True
-        users_storage['users'][str(message.from_user.id)] = True
+    print(db)
     await message.answer(text=msg, reply_markup=main_buttons())
 
 

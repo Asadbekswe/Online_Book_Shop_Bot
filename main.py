@@ -14,7 +14,7 @@ from bot.utils.starter import router
 dp = Dispatcher()
 
 
-async def main_buttons() -> None:
+async def main() -> None:
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     i18n = I18n(path='locales')
     dp.update.outer_middleware.register(FSMI18nMiddleware(i18n))
@@ -26,4 +26,4 @@ async def main_buttons() -> None:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-    asyncio.run(main_buttons())
+    asyncio.run(main())

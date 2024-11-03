@@ -15,7 +15,6 @@ LINKS = {
     'Factor Books': 'https://t.me/factor_books',
     '\"Factor Books\" nashiryoti': 'https://t.me/factorbooks'
 }
-# links = RedisDict('links')
 db = RedisDict('all')
 print(db)
 
