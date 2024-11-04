@@ -16,8 +16,14 @@ main_router = Router()
 @main_router.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
     msg = _('Assalomu alaykum! Tanlovingiz 👇🏻.')
-    if message.from_user.id not in db['users']:
-        db['users'][str(message.from_user.id)] = {
+    user_id = str(message.from_user.id)
+    if user_id not in db['users']:
+        # db['users'] = { user_id : {
+        #     'first_name': message.from_user.first_name,
+        #     'last_name': message.from_user.last_name,
+        # }
+        # }
+        db['users'][user_id] = {
             'first_name': message.from_user.first_name,
             'last_name': message.from_user.last_name,
         }
@@ -61,12 +67,12 @@ async def languages(callback: CallbackQuery, state: FSMContext) -> None:
 
 
 @main_router.message(F.text == __("🔵 Biz ijtimoyi tarmoqlarda"))
-async def our_social_network(message: Message) -> None:
+async def social_handler(message: Message) -> None:
     await message.answer('Biz ijtimoiy tarmoqlarda', reply_markup=main_links_buttons())
 
 
 @main_router.message(F.text == __('📚 Kitoblar'))
-async def books(message: Message) -> None:
+async def books_handler(message: Message) -> None:
     await message.answer(_('Kategoriyalardan birini tanlang'), reply_markup=show_category(message.from_user.id))
 
 
@@ -77,7 +83,7 @@ async def back_handler(callback: CallbackQuery):
 
 
 @main_router.message(F.text == __("📞 Biz bilan bog'lanish"))
-async def message(message: Message) -> None:
+async def info_handler(message: Message) -> None:
     text = _("""\n
 \n
 Telegram: @Mexmonjonovuz\n
