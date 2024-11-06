@@ -120,3 +120,22 @@ async def product_handler(callback: CallbackQuery):
         await callback.message.delete()
         await callback.message.answer_photo(photo=product['image'], caption=product['text'],
                                             reply_markup=ikb.as_markup())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
