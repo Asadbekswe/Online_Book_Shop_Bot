@@ -16,10 +16,10 @@ async def user_inline_handler(inline_query: InlineQuery):
                 id=product_key,
                 title=product_val['name'],
                 input_message_content=InputTextMessageContent(
-                    message_text=f"<i>{product_val['text'][2:]}</i>Buyurtma qilish uchun  : @facror_book_bot\n\nbook_id: {product_key}"
+                    message_text=f"<i>{product_val['text'][2:]}</i>Buyurtma qilish uchun  : @worldbooks_storebot\n\nbook_id: {product_key}"
                 ),
                 thumbnail_url=product_val['thumbnail_url'],
-                description=f"Factor Books\n💵 Narxi: {product_val['price']} so'm",
+                description=f"World Books Store\n💵 Narxi: {product_val['price']} so'm",
             ))
             if count == 50:
                 break
