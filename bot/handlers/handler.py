@@ -12,17 +12,21 @@ from bot.keyboards import show_category, make_plus_minus, main_buttons, lang_com
 
 main_router = Router()
 
+db = {"users": {}}
+
 
 @main_router.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
     msg = _('Assalomu alaykum! Tanlovingiz 👇🏻.')
     user_id = str(message.from_user.id)
+
     if user_id not in db['users']:
         db['users'][user_id] = {
             'first_name': message.from_user.first_name,
             'last_name': message.from_user.last_name,
         }
         msg = _('Assalomu alaykum! \nXush kelibsiz!')
+
     print(db)
     await message.answer(text=msg, reply_markup=main_buttons())
 
