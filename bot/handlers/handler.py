@@ -18,11 +18,6 @@ async def command_start_handler(message: Message) -> None:
     msg = _('Assalomu alaykum! Tanlovingiz 👇🏻.')
     user_id = str(message.from_user.id)
     if user_id not in db['users']:
-        # db['users'] = { user_id : {
-        #     'first_name': message.from_user.first_name,
-        #     'last_name': message.from_user.last_name,
-        # }
-        # }
         db['users'][user_id] = {
             'first_name': message.from_user.first_name,
             'last_name': message.from_user.last_name,
@@ -120,31 +115,3 @@ async def product_handler(callback: CallbackQuery):
         await callback.message.delete()
         await callback.message.answer_photo(photo=product['image'], caption=product['text'],
                                             reply_markup=ikb.as_markup())
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
