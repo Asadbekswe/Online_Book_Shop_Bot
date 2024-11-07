@@ -1,7 +1,9 @@
+import asyncio
 import datetime
 
 from aiogram import F, Router, Bot
 from aiogram.enums import ContentType, ParseMode
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import CallbackQuery, InlineKeyboardButton, ReplyKeyboardMarkup, \
@@ -23,13 +25,15 @@ class BasketState(StatesGroup):
 def order_message(user_id, order_num):
     user_order = db['orders'][str(user_id)][str(order_num)]
     msg = _(
-        '🔢 Buyurtma raqami: <b>{name}</b>\n📆 Buyurtma qilingan sana: <b>{data_time}</b>\n🟣 Buyurtma holati: <b>{order_status}</b>\n').format(
-        name=order_num, date_time=user_order["data_time"], order_status=user_order["order_status"])
+        '🔢 Buyurtma raqami: <b>{name}</b>\n📆 Buyurtma qilingan sana: <b>{date_time}</b>\n🟣 Buyurtma holati: <b>{order_status}</b>\n').format(
+        name=order_num, date_time=user_order["date_time"], order_status=user_order["order_status"])
+
     all_sum = 0
     for i, v in enumerate(user_order['products'].values()):
         summa = int(v['quantity']) * int(v['price'])
         msg += f'\n{i + 1}. 📕 Kitob nomi: {v["product_name"]} \n{v["quantity"]} x {v["price"]} = {str(summa)} so\'m\n'
         all_sum += summa
+
     msg += f'\n💸 Umumiy narxi: {all_sum} so\'m'
     return msg
 
@@ -46,25 +50,44 @@ async def clear(callback: CallbackQuery):
     await to_category(callback)
 
 
+import asyncio
+
+
 @order_router.callback_query(F.data.endswith('confirm'))
 async def confirm(callback: CallbackQuery, state: FSMContext):
     rkb = ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text=_('📞 Telefon raqam'), request_contact=True)]], resize_keyboard=True)
+
     await callback.message.delete()
-    await callback.message.answer(_('Telefon raqamingizni qoldiring (📞 Telefon raqam tugmasini bosing)🔽:'),
-                                  reply_markup=rkb)
+    await callback.message.answer(
+        _('Telefon raqamingizni qoldiring (📞 Telefon raqam tugmasini bosing): 👇🏻'),
+        reply_markup=rkb
+    )
+
     await state.set_state(BasketState.phone_number)
+    msg = await callback.answer(
+        _('📞 Raqamingiz qabul qilindi. Tashakkur!'),
+        reply_markup=main_buttons()
+    )
+    await asyncio.sleep(3)
+    await callback.msg.delete()
 
 
 @order_router.message(F.content_type == ContentType.CONTACT, BasketState.phone_number)
-async def phone_number(message: Message):
-    msg = basket_msg(message.from_user.id)
-    msg += _("\nTelefon raqamingiz: {contact}\n\n<i>Buyurtma berasizmi ?</i>").format(
-        contact=message.contact.phone_number)
+async def phone_number(message: Message, state: FSMContext):
+    if not message.contact:
+        await message.answer(_("Telefon raqamingizni olishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring."))
+        return
+
+    msg = f"{basket_msg(message.from_user.id)}\nTelefon raqamingiz: {message.contact.phone_number}\n\n<i>Buyurtma berasizmi?</i>"
     ikb = InlineKeyboardBuilder()
-    ikb.row(InlineKeyboardButton(text=_("❌ Yo'q"), callback_data='canceled_order'),
-            InlineKeyboardButton(text=_('✅ Ha'), callback_data='confirm_order' + str(message.contact.phone_number)))
+    ikb.row(
+        InlineKeyboardButton(text=_("❌ Yo'q"), callback_data='canceled_order'),
+        InlineKeyboardButton(text=_('✅ Ha'), callback_data=f'confirm_order_{message.contact.phone_number}')
+    )
+
     await message.answer(msg, reply_markup=ikb.as_markup())
+    await state.clear()
 
 
 @order_router.callback_query(F.data.endswith('canceled_order'))
@@ -77,36 +100,59 @@ async def canceled_order(callback: CallbackQuery):
 @order_router.callback_query(F.data.startswith('confirm_order'))
 async def confirm_order(callback: CallbackQuery, bot: Bot):
     await callback.message.delete()
-    orders = db['orders']
-    orders = db['baskets']  # orders
-    orders['baskets']['quantity'] += 1
-    if not orders.get(str(callback.from_user.id)):
-        orders[str(callback.from_user.id)] = {}
-    orders[str(callback.from_user.id)][str(orders['order_num'])] = {
+
+    orders = db.get('orders', {})
+    orders['order_num'] = orders.get('order_num', 0) + 1
+
+    user_id = str(callback.from_user.id)
+    if user_id not in orders:
+        orders[user_id] = {}
+
+    orders[user_id][str(orders['order_num'])] = {
         'date_time': str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
         'order_status': '🔄 kutish holatida',
-        'products': db['baskets'][str(callback.from_user.id)],
+        'products': db.get('baskets', {}).get(user_id, {}),
         'phone_number': callback.data[13:]
     }
+
     db['orders'] = orders
-    ikb = InlineKeyboardBuilder()
-    ikb.row(
-        InlineKeyboardButton(text=_("❌ Yo'q"),
-                             callback_data='from_admin_canceled_order-' + str(callback.from_user.id) + '-' + str(
-                                 orders[
-                                     'order_num'])),
-        InlineKeyboardButton(text=_('✅ Ha'),
-                             callback_data='from_admin_order_accept-' + str(callback.from_user.id) + '-' + str(
-                                 orders[
-                                     'order_num'])))
-    await bot.send_message(ADMIN_LIST[0], order_message(callback.from_user.id,
-                                                        orders[
-                                                            'order_num']) + f"\n\nKlient: +{int(callback.data[13:])} <a href='tg://user?id={callback.from_user.id}'>{callback.from_user.full_name}</a>\n Buyurtmani qabul qilasizmi",
-                           parse_mode=ParseMode.HTML, reply_markup=ikb.as_markup())
+    ikb = InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text=_("❌ Yo'q"),
+                callback_data=f'from_admin_canceled_order-{user_id}-{orders["order_num"]}'
+            ),
+            InlineKeyboardButton(
+                text=_('✅ Ha'),
+                callback_data=f'from_admin_order_accept-{user_id}-{orders["order_num"]}'
+            )
+        ]
+    ])
+
+    user_full_name = callback.from_user.full_name or _("Foydalanuvchi")
+
+    if not ADMIN_LIST:
+        await callback.message.answer(_("Admin list is empty; unable to notify admin."))
+        return
+
+    try:
+        await bot.send_message(
+            ADMIN_LIST[0],
+            order_message(callback.from_user.id, orders["order_num"]) +
+            f"\n\nKlient: +{callback.data[12:].replace('r_', '')} <a href='tg://user?id={callback.from_user.id}'>{user_full_name}</a>\nBuyurtmani qabul qilasizmi?",
+            parse_mode=ParseMode.HTML,
+            reply_markup=ikb
+        )
+    except TelegramBadRequest as e:
+        print(f"Error sending message: {e}")
+
     await callback.message.answer(
         _('✅ Hurmatli mijoz! Buyurtmangiz uchun tashakkur.\nBuyurtma raqami: {orders_num}').format(
-            orders_num=orders["order_num"]),
-        reply_markup=main_buttons())
+            orders_num=orders["order_num"]
+        ),
+        reply_markup=main_buttons()
+    )
+
     clear_users_basket(callback.from_user.id)
 
 

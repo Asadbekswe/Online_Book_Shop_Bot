@@ -88,13 +88,14 @@ Telegram: @Mexmonjonovuz\n
     await message.answer(text=text, parse_mode=ParseMode.HTML)
 
 
-@main_router.message(lambda msg: msg.text[-36:] in db['products'])
+@main_router.message(lambda msg: msg.text is not None and msg.text[-36:] in db['products'])
 async def answer_inline_query(message: Message):
     msg = message.text[-36:]
     product = db['products'][msg]
     ikb = make_plus_minus(1, msg)
     await message.delete()
     await message.answer_photo(photo=product['image'], caption=product['text'], reply_markup=ikb.as_markup())
+
 
 
 @main_router.callback_query()
