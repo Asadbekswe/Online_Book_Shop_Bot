@@ -100,8 +100,8 @@ async def confirm_order(callback: CallbackQuery, bot: Bot):
                                  orders[
                                      'order_num'])))
     await bot.send_message(ADMIN_LIST[0], order_message(callback.from_user.id,
-                                                    orders[
-                                                        'order_num']) + f"\n\nKlient: +{int(callback.data[13:])} <a href='tg://user?id={callback.from_user.id}'>{callback.from_user.full_name}</a>\n Buyurtmani qabul qilasizmi",
+                                                        orders[
+                                                            'order_num']) + f"\n\nKlient: +{int(callback.data[13:])} <a href='tg://user?id={callback.from_user.id}'>{callback.from_user.full_name}</a>\n Buyurtmani qabul qilasizmi",
                            parse_mode=ParseMode.HTML, reply_markup=ikb.as_markup())
     await callback.message.answer(
         _('✅ Hurmatli mijoz! Buyurtmangiz uchun tashakkur.\nBuyurtma raqami: {orders_num}').format(
@@ -126,17 +126,6 @@ async def order_accept_canceled(callback: CallbackQuery, bot: Bot):
         users_orders.pop(user_order[1])
     db['orders'] = orders
 
-
-#
-# @order_router.message(F.text == __('📃 Mening buyurtmalarim'))
-# async def my_orders(message: Message):
-#     if str(message.from_user.id) not in db['orders'] or not db['orders'][str(message.from_user.id)]:
-#         await message.answer(_('🤷‍♂️ Sizda hali buyurtmalar mavjud emas. Yoki bekor qilingan'))
-#     else:
-#         for order in db['orders'][str(message.from_user.id)].keys():
-#             ikb = InlineKeyboardMarkup(inline_keyboard=[
-#                 [InlineKeyboardButton(text=_('❌ bekor qilish'), callback_data='from_user_canceled_order' + order)]])
-#             await message.answer(order_message(message.from_user.id, order), reply_markup=ikb)
 
 @order_router.message(F.text == __('📃 Mening buyurtmalarim'))
 async def my_orders(message: Message):
