@@ -5,6 +5,8 @@ init:
 	pybabel init -i locales/messages.pot -d locales -D messages -l en
 	pybabel init -i locales/messages.pot -d locales -D messages -l uz
 	pybabel init -i locales/messages.pot -d locales -D messages -l tur
+	pybabel init -i locales/messages.pot -d locales -D messages -l ru
+	pybabel init -i locales/messages.pot -d locales -D messages -l ko
 
 compile:
 	pybabel compile -d locales -D messages

@@ -26,7 +26,7 @@ def admin_buttons() -> ReplyKeyboardMarkup:
 def lang_commands():
     ikb = InlineKeyboardBuilder()
     ikb.row(InlineKeyboardButton(text='Uz🇺🇿', callback_data='lang_uz'),
-            InlineKeyboardButton(text='En🇬🇧', callback_data='lang_en'),
+            InlineKeyboardButton(text='En🇺🇸', callback_data='lang_en'),
             InlineKeyboardButton(text='Tur🇹🇷', callback_data="lang_tur"),
             InlineKeyboardButton(text='Ru🇷🇺', callback_data='lang_ru'),
             InlineKeyboardButton(text='Ko🇰🇷', callback_data='lang_ko'))

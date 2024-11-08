@@ -31,13 +31,14 @@ async def command_start_handler(message: Message) -> None:
 @main_router.message(Command(commands='help'))
 async def help_command(message: Message) -> None:
     await message.answer(_('''Buyruqlar:
-/start - Botni ishga tushirish
-/help - Yordam'''))
+/start - Botni ishga tushirish 🫡
+/help - Yordam 📖
+/language - Tilni almashtirish 🔄'''))
 
 
 @main_router.message(F.text == __('🌐 Tilni almshtirish'))
 async def change_language(message: Message) -> None:
-    await message.answer(_('Tilni tanlang: '), reply_markup=lang_commands())
+    await message.answer(_('Tilni tanlang  👇🏻'), reply_markup=lang_commands())
 
 
 @main_router.message(Command(commands=['language']))
@@ -69,12 +70,12 @@ async def social_handler(message: Message) -> None:
 
 @main_router.message(F.text == __('📚 Kitoblar'))
 async def books_handler(message: Message) -> None:
-    await message.answer(_('Kategoriyalardan birini tanlang'), reply_markup=show_category(message.from_user.id))
+    await message.answer(_('Categoriyalardan birini tanlang 👇🏻'), reply_markup=show_category(message.from_user.id))
 
 
 @main_router.callback_query(F.data.startswith('orqaga'))
 async def back_handler(callback: CallbackQuery):
-    await callback.message.edit_text(_('Categoriyalardan birini tanlang'),
+    await callback.message.edit_text(_('Categoriyalardan birini tanlang 👇🏻'),
                                      reply_markup=show_category(callback.from_user.id))
 
 

@@ -24,8 +24,13 @@ class BasketState(StatesGroup):
 def order_message(user_id, order_num):
     user_order = db['orders'][str(user_id)][str(order_num)]
     msg = _(
-        '🔢 Buyurtma raqami: <b>{name}</b>\n📆 Buyurtma qilingan sana: <b>{date_time}</b>\n🟣 Buyurtma holati: <b>{order_status}</b>\n').format(
-        name=order_num, date_time=user_order["date_time"], order_status=user_order["order_status"])
+        '🔢 Buyurtma raqami: <b>{name}</b>\n'
+        '📆 Buyurtma qilingan sana: <b>{date_time}</b>\n'
+        '🟣 Buyurtma holati: <b>{order_status}</b>\n').format(
+        name=order_num,
+        date_time=user_order["date_time"],
+        order_status=user_order["order_status"]
+    )
 
     all_sum = 0
     for i, v in enumerate(user_order['products'].values()):
