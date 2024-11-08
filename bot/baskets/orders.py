@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 
 from aiogram import F, Router, Bot
@@ -50,9 +49,6 @@ async def clear(callback: CallbackQuery):
     await to_category(callback)
 
 
-import asyncio
-
-
 @order_router.callback_query(F.data.endswith('confirm'))
 async def confirm(callback: CallbackQuery, state: FSMContext):
     rkb = ReplyKeyboardMarkup(
@@ -65,12 +61,10 @@ async def confirm(callback: CallbackQuery, state: FSMContext):
     )
 
     await state.set_state(BasketState.phone_number)
-    msg = await callback.answer(
+    await callback.answer(
         _('📞 Raqamingiz qabul qilindi. Tashakkur!'),
         reply_markup=main_buttons()
     )
-    await asyncio.sleep(3)
-    await callback.msg.delete()
 
 
 @order_router.message(F.content_type == ContentType.CONTACT, BasketState.phone_number)
@@ -93,8 +87,7 @@ async def phone_number(message: Message, state: FSMContext):
 @order_router.callback_query(F.data.endswith('canceled_order'))
 async def canceled_order(callback: CallbackQuery):
     await callback.message.delete()
-    await callback.message.answer(_('❌ Bekor qilindi'))
-    await callback.message.answer(_('Asosiy menyu'), reply_markup=main_buttons())
+    await callback.message.answer(_('❌ Bekor qilindi'), reply_markup=main_buttons())
 
 
 @order_router.callback_query(F.data.startswith('confirm_order'))
@@ -197,6 +190,12 @@ async def canceled_order(callback: CallbackQuery, bot: Bot):
     orders[str(callback.from_user.id)].pop(order_num)
     db['orders'] = orders
     await callback.message.answer(f'{order_num} raqamli buyurtmangiz bekor qilindi')
-    await bot.send_message(ADMIN_LIST[0],
-                           f'{order_num} raqamli buyurtma bekor qilindi\n\nZakaz egasi {callback.from_user.mention_markdown(callback.from_user.full_name)}',
-                           parse_mode=ParseMode.MARKDOWN_V2)
+
+    try:
+        await bot.send_message(
+            ADMIN_LIST[0],
+            f'{order_num} raqamli buyurtma bekor qilindi\n\nZakaz egasi {callback.from_user.mention_markdown(callback.from_user.full_name)}',
+            parse_mode=ParseMode.MARKDOWN_V2
+        )
+    except TelegramBadRequest as e:
+        print(f"Failed to send message to admin. Reason: {e}")
