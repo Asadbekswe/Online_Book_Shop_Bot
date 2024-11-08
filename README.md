@@ -6,7 +6,8 @@
 
 
 ## About
-![insta](https://github.com/user-attachments/assets/03768fd5-26ac-4d41-8a8a-153596198281)
+![insta](https://s1.ezgif.com/tmp/ezgif-1-fa7d4856a1.gif)
+
 
 ## Link the bot
 [Telegram Bot](https://t.me/worldbooks_storebot)
