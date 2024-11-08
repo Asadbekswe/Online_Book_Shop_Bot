@@ -20,11 +20,12 @@ The bot has several commands that can be used to access its features:
  
 
 
-## Requirements
+## Python version
+- python~=3.12
 
-- Python v3.12
-- aiogram v3
-- dotenv v1
+## Essential libraries
+- aiogram==3.5.0
+- python-dotenv==1.0.1
 
 ## Installation
 
