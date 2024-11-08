@@ -31,12 +31,9 @@ The bot has several commands that can be used to access its features:
 
 To get started with this bot, follow these steps:
 
-- Clone this repository to your local machine.
-
-    ```
-    $ git clone https://github.com/mexmonjonovuz/Instadownloader_bot.git
-    
-    ```
+1. **Clone this repository to your local machine**:
+   ```bash
+   git clone https://github.com/mexmonjonovuz/Online_Book_Shop_Bot.git
 
 - Create a virtual environment, activate it and install required dependencies.
 
