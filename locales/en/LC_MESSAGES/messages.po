@@ -100,7 +100,7 @@ msgid ""
 "✅ Hurmatli mijoz! Buyurtmangiz uchun tashakkur.\n"
 "Buyurtma raqami: {orders_num}"
 msgstr ""
-" ✅ Dear customer! Thank you for your order.\n"
+"✅ Dear customer! Thank you for your order.\n"
 "Order number: {orders_num}"
 #: bot/baskets/orders.py:165
 msgid "<i>🎉 Sizning {order_num} raqamli buyurtmangizni admin qabul qildi.</i>"

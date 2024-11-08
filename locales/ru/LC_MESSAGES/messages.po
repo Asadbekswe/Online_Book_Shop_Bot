@@ -98,7 +98,7 @@ msgid ""
 "✅ Hurmatli mijoz! Buyurtmangiz uchun tashakkur.\n"
 "Buyurtma raqami: {orders_num}"
 msgstr ""
-" ✅ Уважаемый покупатель! Спасибо за заказ.\n"
+"✅ Уважаемый покупатель! Спасибо за заказ.\n"
 "Номер заказа: {orders_num}"
 
 #: bot/baskets/orders.py:165

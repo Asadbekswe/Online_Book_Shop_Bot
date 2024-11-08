@@ -81,11 +81,15 @@ async def back_handler(callback: CallbackQuery):
 
 @main_router.message(F.text == __("📞 Biz bilan bog'lanish"))
 async def info_handler(message: Message) -> None:
-    text = _("""\n
-\n
-Telegram: @Mexmonjonovuz\n
-📞  +{number}\n
-🤖 Bot Mexmonjonov Asadbek @Mexmonjonovuz tomonidan tayorlandi.\n""".format(number=998901209552))
+    text = _(
+        """
+        \n
+        \n
+        Telegram: @Mexmonjonovuz\n
+        📞  +{number}\n
+        🤖 Bot Mexmonjon Asadbek @Mexmonjonovuz tomonidan tayorlandi.\n
+        """
+    ).format(number=998901209552)
     await message.answer(text=text, parse_mode=ParseMode.HTML)
 
 

@@ -96,7 +96,8 @@ msgstr "관리자 목록이 비어 있습니다. 관리자에게 알릴 수 없�
 msgid ""
 "✅ Hurmatli mijoz! Buyurtmangiz uchun tashakkur.\n"
 "Buyurtma raqami: {orders_num}"
-msgstr " ✅ 친애하는 고객님! 주문해 주셔서 감사합니다.\n"
+msgstr ""
+"✅ 친애하는 고객님! 주문해 주셔서 감사합니다.\n"
 "주문 번호: {orders_num}"
 
 #: bot/baskets/orders.py:165
