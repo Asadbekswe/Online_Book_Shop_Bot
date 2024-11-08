@@ -4,6 +4,7 @@
 ![aiogram](https://img.shields.io/badge/python-v3.12-blue.svg?logo=python&logoColor=yellow) ![aiogram](https://img.shields.io/badge/aiogram-v3-blue.svg?logo=telegram) ![Redis](https://img.shields.io/badge/redis-dictionary--storage-red.svg?logo=redis)
 
 
+
 ## About
 ![insta](https://github.com/user-attachments/assets/03768fd5-26ac-4d41-8a8a-153596198281)
 
