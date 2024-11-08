@@ -35,15 +35,51 @@ To get started with this bot, follow these steps:
    ```bash
    git clone https://github.com/mexmonjonovuz/Online_Book_Shop_Bot.git
 
-- Create a virtual environment, activate it and install required dependencies.
+2. **Navigate into the project directory**:
 
-    ```
-    $ python3.12 -m venv .venv
-    $ source .venv/bin/activate
-    $ pip install -r requirements.txt
-    ```
+   ```bash
+   cd Online_Book_Shop_Bot
+   ```
+3. **Create a virtual environment**:
+
+   ```bash
+   python3 -m venv .venv
+   ```
+4. **Activate the virtual environment:**
+
+   **For macOS / Linux:**
+
+   ```bash
+   source .venv/bin/activate
+   ```
+   **For Windows:**
+   ```bash
+    . .venv\Scripts\activate
+   ```
+5. Install the required dependencies:
+    ```bash
+    pip install -r requirements.txt
+   ```
+
+6. **I have created a copy of the .env conf file for you to use .env.example**
+    <blockquote>
+        <pre>
+            <code>
+   In the root directory, create a .env file and add your environment variables:
+            </code>
+        </pre>
+    </blockquote>
+
+- Run the bot using(bash or shell)
+    ```bash
+    python3 main.py
+   ```
+    ```bash
+    chmod +x main.py
+   ./main.py
+   ```
 
 - Create a new bot on Telegram by talking to the BotFather, and [obtain the API token](https://www.siteguarding.com/en/how-to-get-telegram-bot-api-token).
 
-- Run the bot using `python main.py`.
+
 
