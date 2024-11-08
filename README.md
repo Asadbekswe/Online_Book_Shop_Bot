@@ -1,89 +1,47 @@
-# <div align="center">TELEGRAM BOT BOOK👾</div>
+# Insta Reels Downloader Bot
 
-<div align="center">
-<img src="assets/main-photo.png" align="center" style="width: 50%; height: 40%" />
-</div>
 
-<br/>
-While reading a course on creating telegram bots, I saw a comment from the person who created the telegram bot sea
-battle. I also wanted to create my own bot, but using modern technologies, libraries, databases and optimization.
+![aiogram](https://img.shields.io/badge/python-v3.12-blue.svg?logo=python&logoColor=yellow) ![aiogram](https://img.shields.io/badge/aiogram-v3-blue.svg?logo=telegram) 
 
-## Description
 
-<div align="center">
-<img src="assets/work.gif" align="center" style="width: 60%; height: 40%" />
-</div>
-<br/>
+## About
+![insta](https://github.com/user-attachments/assets/03768fd5-26ac-4d41-8a8a-153596198281)
 
-My project is a full-fledged bot created to read books directly from telegram. You can select a book, flip through the
-pages, go to the table of contents and select the desired page there, add pages to bookmarks, click on them and delete
-them. There are also convenient commands for going to the beginning of the book or continuing reading from the place
-where you finished.
+## Link the bot
+[Telegram Bot](https://t.me/instdownloder_bot)
 
-## Technologies
+## Commands
 
-***Language***
+The bot has several commands that can be used to access its features:
 
-![Python](https://img.shields.io/badge/-Python-1C1C1C?&style=for-the-badge)
+- `/start`:  Start the bot
 
-***Framework***
+## Requirements
 
-![Aiogram](https://img.shields.io/badge/-Aiogram-1C1C1C?&style=for-the-badge)
+- Python v3.12
+- aiogram v3
+- dotenv v1
 
-***Databases***
+## Installation
 
-![Postgres](https://img.shields.io/badge/-Postgresql-1C1C1C?&style=for-the-badge)
-![Redis](https://img.shields.io/badge/-Redis-1C1C1C?&style=for-the-badge)
+To get started with this bot, follow these steps:
 
-***Libraries***
+- Clone this repository to your local machine.
 
-![SQLAlchemy](https://img.shields.io/badge/-SQlalchemy-1C1C1C?&style=for-the-badge)
-![Asyncio](https://img.shields.io/badge/-asyncio-1C1C1C?&style=for-the-badge)
-![Aiocron](https://img.shields.io/badge/-aiocron-1C1C1C?&style=for-the-badge)
-![Asyncpg](https://img.shields.io/badge/-asyncpg-1C1C1C?&style=for-the-badge)
-![aioredis](https://img.shields.io/badge/-aioredis-1C1C1C?&style=for-the-badge)
-![Environs](https://img.shields.io/badge/-Environs-1C1C1C?&style=for-the-badge)
-![requests](https://img.shields.io/badge/-requests-1C1C1C?&style=for-the-badge)
-![alembic](https://img.shields.io/badge/-alembic-1C1C1C?&style=for-the-badge)
+    ```
+    $ git clone https://github.com/mexmonjonovuz/Instadownloader_bot.git
+    
+    ```
 
-***Other***
+- Create a virtual environment, activate it and install required dependencies.
 
-![Docker](https://img.shields.io/badge/-Docker-1C1C1C?&style=for-the-badge)
+    ```
+    $ python3.12 -m venv .venv
+    $ source .venv/bin/activate
+    $ pip install -r requirements.txt
+    ```
 
-I wrote a python bot using aiogram. I used two databases: Postgresql for storing user data, books and bookmarks, and
-Redis for caching data and optimizing work. The bot takes data about books via API from a [third-party service](https://github.com/brestok-1/drf-tg-data) and stores
-them in the database. With the help of the Aiocron library, the database is updated every hour. I also connected an
-alembic to initialize the database and create migrations
+- Create a new bot on Telegram by talking to the BotFather, and [obtain the API token](https://www.siteguarding.com/en/how-to-get-telegram-bot-api-token).
 
-## Project setup
+- Run the bot using `python main.py`.
 
-***Method 1: Via docker-compose***
-
-1. Create a .env file and paste the data from the .env.example file into it
-2. In REDIS_HOST and POSTGRES_HOST, specify the names of docker-compose services (redis and db)
-3. In BOT_TOKEN, specify the token of your telegram bot created earlier via BotFather
-4. In the terminal, enter the following command:
-
-```
-docker-compose up --build
-```
-
-***Method 2: Via virtual environment***
-
-1. Create and activate a python virtual environment
-2. In the terminal, enter the following command:
-
-```
-pip3 install -r requirements.txt
-```
-
-3. Create a .env file and paste the data from the .env.example file into it
-4. In REDIS_HOST and POSTGRES_HOST, specify localhost
-5. In BOT_TOKEN, specify the token of your telegram bot created earlier via BotFather
-6. In the terminal, enter the following command:
-
-```
-watchfiles --filter python 'python -m bot'
-```
-
-## <div align="center">Thank you for taking the time to review my project. Enjoy reading!👋</div>
