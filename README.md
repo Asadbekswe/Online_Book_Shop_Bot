@@ -6,7 +6,8 @@
 
 
 ## About
-![insta](https://s1.ezgif.com/tmp/ezgif-1-fa7d4856a1.gif)
+![book_github](https://github.com/user-attachments/assets/53066493-626b-4d6c-b31d-fa931029980f)
+
 
 
 ## Link the bot
