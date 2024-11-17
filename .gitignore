@@ -650,3 +650,4 @@ cython_debug/
 #.idea/
 
 !/requirements.txt
+!/locales
