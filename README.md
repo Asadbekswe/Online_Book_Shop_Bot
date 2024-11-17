@@ -6,7 +6,9 @@
 
 
 ## About
-![insta](https://github.com/user-attachments/assets/03768fd5-26ac-4d41-8a8a-153596198281)
+![book_github](https://github.com/user-attachments/assets/53066493-626b-4d6c-b31d-fa931029980f)
+
+
 
 ## Link the bot
 [Telegram Bot](https://t.me/worldbooks_storebot)
