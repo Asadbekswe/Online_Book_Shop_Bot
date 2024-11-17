@@ -14,12 +14,11 @@ from bot.utils.starter import router
 
 dp = Dispatcher()
 
-locales_path = f"{os.getcwd()}/locales"
 
 
 async def main() -> None:
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-    i18n = I18n(path=locales_path)
+    i18n = I18n(path="locales")
     dp.update.outer_middleware.register(FSMI18nMiddleware(i18n))
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
