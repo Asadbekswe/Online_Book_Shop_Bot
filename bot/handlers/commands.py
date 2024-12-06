@@ -1,10 +1,12 @@
 from aiogram import Dispatcher, Bot
 from aiogram.types import BotCommand
 from bot.config import db
+from db.models import database
 
 dispatcher = Dispatcher()
 
 async def on_startup(dispatcher: Dispatcher, bot: Bot):
+    await database.create_all()
     if not db.get('categories'):
         db['categories'] = {}
     if not db.get('products'):

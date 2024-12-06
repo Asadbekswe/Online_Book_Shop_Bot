@@ -58,7 +58,6 @@ async def clear(callback: CallbackQuery):
 async def confirm(callback: CallbackQuery, state: FSMContext):
     rkb = ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text=_('📞 Telefon raqam'), request_contact=True)]], resize_keyboard=True)
-
     await callback.message.delete()
     await callback.message.answer(
         _('Telefon raqamingizni qoldiring (📞 Telefon raqam tugmasini bosing): 👇🏻'),
@@ -70,6 +69,13 @@ async def confirm(callback: CallbackQuery, state: FSMContext):
         _('📞 Raqamingiz qabul qilindi. Tashakkur!'),
         reply_markup=main_buttons()
     )
+    # user = User.get_with_telegram_id(telegram_id=callback.from_user.id)
+    # if user:
+    #     await User.update(phone_number=(await state.set_state(BasketState.phone_number)))
+    #     await callback.answer(
+    #         _('📞 Raqamingiz qabul qilindi. Tashakkur!'),
+    #         reply_markup=main_buttons()
+    #     )
 
 
 @order_router.message(F.content_type == ContentType.CONTACT, BasketState.phone_number)

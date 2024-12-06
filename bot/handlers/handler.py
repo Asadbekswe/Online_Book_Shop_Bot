@@ -9,6 +9,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from bot.config.conf import db
 from bot.keyboards import show_category, make_plus_minus, main_buttons, lang_commands, \
     main_links_buttons
+from db.models import User
 
 main_router = Router()
 
@@ -16,15 +17,11 @@ main_router = Router()
 @main_router.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
     msg = _('Assalomu alaykum! Tanlovingiz 👇🏻.')
-    user_id = str(message.from_user.id)
-
-    if user_id not in db['users']:
-        db['users'][user_id] = {
-                'first_name': message.from_user.first_name,
-                'last_name': message.from_user.last_name,
-        }
+    user_data = message.from_user.model_dump(include={'id', 'first_name', 'last_name', 'username'})
+    if not await User.get_with_telegram_id(telegram_id=message.from_user.id):
+        await User.create(first_name=user_data['first_name'], last_name=user_data['last_name'],
+                          username=user_data['username'], telegram_id=user_data['id'])
         msg = _('Assalomu alaykum! \nXush kelibsiz!')
-    print(db['users'])
     await message.answer(text=msg, reply_markup=main_buttons())
 
 
@@ -100,7 +97,6 @@ async def answer_inline_query(message: Message):
     ikb = make_plus_minus(1, msg)
     await message.delete()
     await message.answer_photo(photo=product['image'], caption=product['text'], reply_markup=ikb.as_markup())
-
 
 
 @main_router.callback_query()

@@ -1,6 +1,6 @@
 from typing import List
 
-from sqlalchemy import ForeignKey, BigInteger, VARCHAR, Float
+from sqlalchemy import ForeignKey, BigInteger, VARCHAR, Float, SMALLINT
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -28,6 +28,7 @@ class Product(CreatedModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     price: Mapped[str] = mapped_column(Float())
     name: Mapped[str] = mapped_column(VARCHAR(20))
+    quantity: Mapped[int] = mapped_column(SMALLINT, default=0)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     user: Mapped[List["User"]] = relationship(back_populates="products")
     category_id: Mapped[int] = mapped_column(ForeignKey("categorys.id"))
