@@ -20,8 +20,9 @@ admin_router.message.filter(ChatTypeFilter([ChatType.PRIVATE]), IsAdmin())
 
 @admin_router.message(CommandStart())
 async def start_for_admin(message: Message):
-    await message.answer(f'Assalomu aleykum {message.from_user.full_name} 🫡 Tanlovingiz (Admin) ❕',
-                         reply_markup=admin_buttons())
+    await message.answer(
+        f'<i> Assalomu aleykum </i> <b> {message.from_user.full_name} </b> 🫡 Tanlovingiz <tg-spoiler>(Admin)</tg-spoiler> ❕',
+        reply_markup=admin_buttons())
 
 
 @admin_router.message(F.text == '📚 Kitoblar')
@@ -30,15 +31,18 @@ async def books_handler(message: Message) -> None:
 
 
 class FormAdministrator(StatesGroup):
-    product_name = State()
-    product_price = State()
-    product_photo = State()
+    product_title = State()
+    product_image = State()
     product_description = State()
+    product_price = State()
+    product_discount_price = State()
+    product_quantity = State()
     product_category = State()
-    category = State()
-    see_category = State()
+    category_name = State()
+    show_category = State()
     product_delete = State()
     category_delete = State()
+    social_link = State()
 
 
 storage = {}
@@ -46,60 +50,93 @@ storage = {}
 
 @admin_router.message(F.text == 'Product ➕')
 async def add_product(message: Message, state: FSMContext):
-    if not db['categories']:
+    categories = await Category.get_all()
+    if not categories:
         await message.answer("Product qo'shishdan avval Category kiritish zarur ⁉️")
         return
-    await state.set_state(FormAdministrator.product_name)
+    await state.set_state(FormAdministrator.product_title)
     await message.answer('Product nomini kiriting 👇🏻', reply_markup=ReplyKeyboardRemove())
 
 
-@admin_router.message(FormAdministrator.product_name)
-async def add_product(message: Message, state: FSMContext):
-    storage['name'] = message.text
+@admin_router.message(FormAdministrator.product_title)
+async def add_product_title(message: Message, state: FSMContext):
+    await state.update_data(product_title=message.text)
+    await state.set_state(FormAdministrator.product_image)
+    await message.answer("Product 🖼 rasmini jo'nating 👇🏻")
+
+
+@admin_router.message(FormAdministrator.product_image)
+async def add_product_image(message: Message, state: FSMContext):
+    file = await message.bot.get_file(message.photo[-1].file_id)
+    url = await make_url((await message.bot.download(file.file_id)).read())
+    await state.update_data(product_image=url)
     await state.set_state(FormAdministrator.product_description)
-    await message.answer('Product description kiriting 👇🏻')
+    await message.answer("Product 📝 description kiriting 👇🏻")
 
 
 @admin_router.message(FormAdministrator.product_description)
-async def add_product(message: Message, state: FSMContext):
-    storage['text'] = message.text
-    await state.set_state(FormAdministrator.product_photo)
-    await message.answer("Product rasmini jo'nating 👇🏻 ")
-
-
-@admin_router.message(FormAdministrator.product_photo)
-async def add_product(message: Message, state: FSMContext):
-    url = await make_url(
-        ((await message.bot.download((await message.bot.get_file(message.photo[-1].file_id)).file_id)).read()))
-    storage['image'] = message.photo[0].file_id
-    storage['thumbnail_url'] = url
+async def add_product_description(message: Message, state: FSMContext):
+    await state.update_data(product_description=message.text)
     await state.set_state(FormAdministrator.product_price)
-    await message.answer('Product narxini kiriting 👇🏻 ')
+    await message.answer("Product narxini kiriting 💸 👇🏻")
 
 
 @admin_router.message(FormAdministrator.product_price)
-async def add_product(message: Message, state: FSMContext):
-    storage['price'] = message.text
+async def add_product_price(message: Message, state: FSMContext):
+    await state.update_data(product_price=float(message.text))
+    await state.set_state(FormAdministrator.product_discount_price)
+    await message.answer("Product 🏷 chegirma narxini 💸 kiriting 👇🏻")
+
+
+@admin_router.message(FormAdministrator.product_discount_price)
+async def add_product_discount_price(message: Message, state: FSMContext):
+    await state.update_data(product_discount_price=float(message.text))
+    await state.set_state(FormAdministrator.product_quantity)
+    await message.answer('Productlar sonini kiriting (7️⃣ 👇🏻)')
+
+
+@admin_router.message(FormAdministrator.product_quantity)
+async def add_product_quantity(message: Message, state: FSMContext):
+    await state.update_data(product_quantity=int(message.text))
     await state.set_state(FormAdministrator.product_category)
-    await message.answer('Categoryni tanlang 👇🏻', reply_markup=show_category(message.from_user.id))
+
+    categories = await Category.get_all()
+    ikb = InlineKeyboardBuilder()
+
+    for category in categories:
+        ikb.add(
+            InlineKeyboardButton(
+                text=category.name,
+                callback_data=category.id
+            )
+        )
+
+    await message.answer(
+        'Categoryni tanlang 👇🏻',
+        reply_markup=ikb.as_markup()
+    )
 
 
 @admin_router.callback_query(FormAdministrator.product_category)
-async def add_product(callback: CallbackQuery, state: FSMContext):
-    if callback.data not in db['categories']:
+async def add_product_category(callback: CallbackQuery, state: FSMContext):
+    categories = await Category.get_all()
+    category_ids = [category.id for category in categories]
+
+    if callback.data not in category_ids:
         await callback.answer('Category tanlashda xatolik Mavjud ‼️')
         return
-    storage['category_id'] = callback.data
-    product = db['products']
-    product[str(uuid4())] = storage
-    db['products'] = product
+
+    data = await state.get_data()
     await Product.create(
-        title=state.set_state(FormAdministrator.product_name),
-        image=state.set_state(FormAdministrator.product_photo),
-        description=state.set_state(FormAdministrator.product_description),
-        price=state.set_state(FormAdministrator.product_price),
-        # quantity=state.set_state(FormAdministrator.product_quantity),
+        title=data['product_title'],
+        image=data['product_image'],
+        description=data['product_description'],
+        price=float(data['product_price']),
+        discount_price=float(data['product_discount_price']),
+        quantity=int(data['product_quantity']),
+        category_id=callback.data,
     )
+
     await state.clear()
     await callback.message.delete()
     await callback.message.answer('Saqlandi ✅', reply_markup=admin_buttons())
@@ -107,11 +144,11 @@ async def add_product(callback: CallbackQuery, state: FSMContext):
 
 @admin_router.message(F.text == 'Category ➕')
 async def add_category(message: Message, state: FSMContext):
-    await state.set_state(FormAdministrator.category)
+    await state.set_state(FormAdministrator.category_name)
     await message.answer('Category nomini kiriting 👇🏻', reply_markup=ReplyKeyboardRemove())
 
 
-@admin_router.message(FormAdministrator.category)
+@admin_router.message(FormAdministrator.category_name)
 async def add_category(message: Message, state: FSMContext) -> None:
     category = db['categories']
     category[str(uuid4())] = message.text
@@ -122,47 +159,77 @@ async def add_category(message: Message, state: FSMContext) -> None:
 
 
 @admin_router.message(F.text == "Product ➖ (🗑 o'chirish)")
-async def category_delete(message: Message, state: FSMContext) -> None:
-    await message.answer('Tanlang', reply_markup=ReplyKeyboardRemove())
-    await message.reply('👇🏻', reply_markup=show_category(message.from_user.id))
-    await state.set_state(FormAdministrator.see_category)
+async def show_products_for_deletion(message: Message, state: FSMContext) -> None:
+    products = await Product.get_all()
+
+    if not products:
+        await message.answer("Hozirda hech qanday product mavjud emas.")
+        return
+
+    ikb = InlineKeyboardBuilder()
+    ikb.row(*[InlineKeyboardButton(text=product.title, callback_data=str(product.id)) for product in products])
+    ikb.adjust(2, 2)
+
+    await message.answer("O'chirilishi kerak bo'lgan productni tanlang 👇🏻", reply_markup=ikb.as_markup())
+    await state.set_state(FormAdministrator.product_delete)
 
 
 @admin_router.callback_query(FormAdministrator.product_delete)
-async def product_delete(callback: CallbackQuery, state: FSMContext):
-    products = db['products']
-    products.pop(callback.data)
-    db['products'] = products
+async def delete_product(callback: CallbackQuery, state: FSMContext) -> None:
+    product_id = int(callback.data)
+
+    product = await Product.get(id_=product_id)
+    if product:
+        await Product.delete(id_=product_id)
+        await callback.message.delete()
+        await callback.message.answer(
+            f"Product '{product.title}' muvaffaqiyatli o'chirildi ✅",
+            reply_markup=admin_buttons()
+        )
+    else:
+        await callback.answer("Bunday product mavjud emas yoki allaqachon o'chirilgan!")
+
     await state.clear()
-    await callback.message.delete()
-    await callback.message.answer('Product deleted ✅', reply_markup=admin_buttons())
 
 
 @admin_router.message(F.text == "Category ➖ (🗑 o'chirish)")
 async def category_delete(message: Message, state: FSMContext) -> None:
-    await message.answer('Tanlang', reply_markup=ReplyKeyboardRemove())
-    await message.reply('👇🏻', reply_markup=show_category(message.from_user.id))
+    categories = await Category.get_all()
+    if not categories:
+        await message.answer("Categorylar mavjud emas !!!")
+        return
+
+    ikb = InlineKeyboardBuilder()
+    for category in categories:
+        ikb.add(
+            InlineKeyboardButton(
+                text=category.name,
+                callback_data=str(category.id)
+            )
+        )
+    await message.answer("Category tanlang 👇🏻", reply_markup=ikb.as_markup())
     await state.set_state(FormAdministrator.category_delete)
 
 
 @admin_router.callback_query(FormAdministrator.category_delete)
 async def category_delete(callback: CallbackQuery, state: FSMContext) -> None:
-    new_products = {}
-    for key, val in db['products'].items():
-        if val['category_id'] != callback.data:
-            new_products[key] = val
-    db['products'] = new_products
-    category = db['categories']
-    category.pop(callback.data)
-    db['categories'] = category
-    # await Category.delete(callback.data)
-    await state.clear()
-    await callback.message.delete()
-    await callback.message.answer(text="Categoryga tegishli bo'lgan product va category o'chirildi ✅",
-                                  reply_markup=admin_buttons())
+    try:
+        category_id = int(callback.data)
+        await Category.delete(id_=category_id)
+        await callback.message.delete()
+        await callback.message.answer(
+            text="Category va unga tegishli productlar o'chirildi ✅",
+            reply_markup=admin_buttons()
+        )
+    except ValueError:
+        await callback.answer("Category ID noto'g'ri formatda!")
+    except Exception as e:
+        await callback.answer(f"Xatolik yuz berdi: {e}")
+    finally:
+        await state.clear()
 
 
-@admin_router.callback_query(FormAdministrator.see_category)
+@admin_router.callback_query(FormAdministrator.show_category)
 async def show_product(callback: CallbackQuery, state: FSMContext):
     ikb = InlineKeyboardBuilder()
     for key, val in db['products'].items():
