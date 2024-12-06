@@ -1,4 +1,6 @@
-from aiogram import F, Router
+import os
+
+from aiogram import F, Router, Bot
 from aiogram.enums import ChatType
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
@@ -9,11 +11,14 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from bot.config import db
 from bot.filters.is_admin import ChatTypeFilter, IsAdmin
 from bot.keyboards import show_category, admin_buttons
-from bot.utils.uploader import make_url
 from db.models.users import Category, Product
 
 admin_router = Router()
 admin_router.message.filter(ChatTypeFilter([ChatType.PRIVATE]), IsAdmin())
+
+MEDIA_DIRECTORY = './media'
+
+os.makedirs(MEDIA_DIRECTORY, exist_ok=True)
 
 
 class FormAdministrator(StatesGroup):
@@ -49,7 +54,6 @@ async def add_category(message: Message, state: FSMContext):
     await message.answer('Category nomini kiriting 👇🏻', reply_markup=ReplyKeyboardRemove())
 
 
-
 @admin_router.message(FormAdministrator.category_name)
 async def add_category(message: Message, state: FSMContext) -> None:
     category_name = message.text.strip()
@@ -64,6 +68,7 @@ async def add_category(message: Message, state: FSMContext) -> None:
     await Category.create(name=category_name)
     await state.clear()
     await message.answer("Category Bazaga Saqlandi ✅", reply_markup=admin_buttons())
+
 
 @admin_router.message(F.text == 'Product ➕')
 async def add_product(message: Message, state: FSMContext):
@@ -83,11 +88,15 @@ async def add_product_title(message: Message, state: FSMContext):
 
 
 @admin_router.message(FormAdministrator.product_image)
-async def add_product_image(message: Message, state: FSMContext):
+async def add_product_image(message: Message, state: FSMContext, bot: Bot):
     file = await message.bot.get_file(message.photo[-1].file_id)
-    print(file)
-    url = await make_url((await message.bot.download(file.file_id)).read())
-    await state.update_data(product_image=url)
+
+    file_path = os.path.join(MEDIA_DIRECTORY, f"{file.file_id}.jpg")
+    await message.bot.download(file.file_id, file_path)
+    with open(file_path, 'rb') as img_file:
+        img_bytes = img_file.read()
+
+    await state.update_data(product_image=file_path)
     await state.set_state(FormAdministrator.product_description)
     await message.answer("Product 📝 description kiriting 👇🏻")
 
@@ -117,21 +126,17 @@ async def add_product_discount_price(message: Message, state: FSMContext):
 async def add_product_quantity(message: Message, state: FSMContext):
     await state.update_data(product_quantity=int(message.text))
     await state.set_state(FormAdministrator.product_category)
-
     categories = await Category.get_all()
     ikb = InlineKeyboardBuilder()
     for category in categories:
         ikb.add(
             InlineKeyboardButton(
                 text=category.name,
-                callback_data=category.id
+                callback_data=str(category.id)
             )
         )
 
-    await message.answer(
-        'Categoryni tanlang 👇🏻',
-        reply_markup=ikb.as_markup()
-    )
+    await message.answer('Categoryni tanlang 👇🏻', reply_markup=ikb.as_markup())
 
 
 @admin_router.callback_query(FormAdministrator.product_category)
@@ -139,7 +144,7 @@ async def add_product_category(callback: CallbackQuery, state: FSMContext):
     categories = await Category.get_all()
     category_ids = [category.id for category in categories]
 
-    if callback.data not in category_ids:
+    if int(callback.data) not in category_ids:
         await callback.answer('Category tanlashda xatolik Mavjud ‼️')
         return
 
@@ -151,7 +156,7 @@ async def add_product_category(callback: CallbackQuery, state: FSMContext):
         price=float(data['product_price']),
         discount_price=float(data['product_discount_price']),
         quantity=int(data['product_quantity']),
-        category_id=callback.data,
+        category_id=int(callback.data),
     )
 
     await state.clear()

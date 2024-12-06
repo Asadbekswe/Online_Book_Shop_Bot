@@ -22,7 +22,7 @@ class User(CreatedModel):
     telegram_id: Mapped[int] = mapped_column(BigInteger)
     phone_number: Mapped[str] = mapped_column(VARCHAR(255), nullable=True)
     type: Mapped[Type] = mapped_column(SQLEnum(Type), default=Type.USER)
-    products: Mapped[List["Product"]] = relationship(back_populates="user", cascade="all, delete")
+    # location: Mapped[""]
 
 
 class Category(CreatedModel):
@@ -39,7 +39,5 @@ class Product(CreatedModel):
     price: Mapped[float] = mapped_column(Float())
     discount_price: Mapped[float] = mapped_column(Float(), default=0.0)
     quantity: Mapped[int] = mapped_column(SMALLINT, default=0)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    user: Mapped[List["User"]] = relationship(back_populates="products")
-    category_id: Mapped[int] = mapped_column(ForeignKey("categorys.id"))
-    category: Mapped[List["Category"]] = relationship(back_populates="products", cascade="all, delete")
+    category_id: Mapped[int] = mapped_column(ForeignKey("categorys.id", ondelete="CASCADE"))
+    category: Mapped["Category"] = relationship("Category", back_populates="products", cascade="all, delete")
