@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 from aiogram import F, Router
 from aiogram.enums import ChatType
 from aiogram.filters import CommandStart
@@ -18,18 +16,6 @@ admin_router = Router()
 admin_router.message.filter(ChatTypeFilter([ChatType.PRIVATE]), IsAdmin())
 
 
-@admin_router.message(CommandStart())
-async def start_for_admin(message: Message):
-    await message.answer(
-        f'<i> Assalomu aleykum </i> <b> {message.from_user.full_name} </b> 🫡 Tanlovingiz <tg-spoiler>(Admin)</tg-spoiler> ❕',
-        reply_markup=admin_buttons())
-
-
-@admin_router.message(F.text == '📚 Kitoblar')
-async def books_handler(message: Message) -> None:
-    await message.answer('Categoriyalardan birini tanlang 👇🏻', reply_markup=show_category(message.from_user.id))
-
-
 class FormAdministrator(StatesGroup):
     product_title = State()
     product_image = State()
@@ -45,15 +31,46 @@ class FormAdministrator(StatesGroup):
     social_link = State()
 
 
-storage = {}
+@admin_router.message(CommandStart())
+async def start_for_admin(message: Message):
+    await message.answer(
+        f'<i> Assalomu aleykum </i> <b> {message.from_user.full_name} </b> 🫡 Tanlovingiz <tg-spoiler>(Admin)</tg-spoiler> ❕',
+        reply_markup=admin_buttons())
 
+
+@admin_router.message(F.text == '📚 Kitoblar')
+async def books_handler(message: Message) -> None:
+    await message.answer('Categoriyalardan birini tanlang 👇🏻', reply_markup=show_category(message.from_user.id))
+
+
+@admin_router.message(F.text == 'Category ➕')
+async def add_category(message: Message, state: FSMContext):
+    await state.set_state(FormAdministrator.category_name)
+    await message.answer('Category nomini kiriting 👇🏻', reply_markup=ReplyKeyboardRemove())
+
+
+
+@admin_router.message(FormAdministrator.category_name)
+async def add_category(message: Message, state: FSMContext) -> None:
+    category_name = message.text.strip()
+
+    if category_name.isdigit() or not category_name:
+        await message.answer(
+            "Category nomi faqat harflardan iborat bo'lishi kerak, raqamlar bo'lmasligi kerak. Iltimos, qayta kiritib ko'ring:",
+            reply_markup=ReplyKeyboardRemove()
+        )
+        await state.set_state(FormAdministrator.category_name)
+        return
+    await Category.create(name=category_name)
+    await state.clear()
+    await message.answer("Category Bazaga Saqlandi ✅", reply_markup=admin_buttons())
 
 @admin_router.message(F.text == 'Product ➕')
 async def add_product(message: Message, state: FSMContext):
-    categories = await Category.get_all()
-    if not categories:
-        await message.answer("Product qo'shishdan avval Category kiritish zarur ⁉️")
-        return
+    # categories = await Category.get_all() XATOLIKNI TEKSHIRING
+    # if not categories:
+    #     await message.answer("Product qo'shishdan avval Category kiritish zarur ⁉️")
+    #     return
     await state.set_state(FormAdministrator.product_title)
     await message.answer('Product nomini kiriting 👇🏻', reply_markup=ReplyKeyboardRemove())
 
@@ -68,6 +85,7 @@ async def add_product_title(message: Message, state: FSMContext):
 @admin_router.message(FormAdministrator.product_image)
 async def add_product_image(message: Message, state: FSMContext):
     file = await message.bot.get_file(message.photo[-1].file_id)
+    print(file)
     url = await make_url((await message.bot.download(file.file_id)).read())
     await state.update_data(product_image=url)
     await state.set_state(FormAdministrator.product_description)
@@ -102,7 +120,6 @@ async def add_product_quantity(message: Message, state: FSMContext):
 
     categories = await Category.get_all()
     ikb = InlineKeyboardBuilder()
-
     for category in categories:
         ikb.add(
             InlineKeyboardButton(
@@ -140,22 +157,6 @@ async def add_product_category(callback: CallbackQuery, state: FSMContext):
     await state.clear()
     await callback.message.delete()
     await callback.message.answer('Saqlandi ✅', reply_markup=admin_buttons())
-
-
-@admin_router.message(F.text == 'Category ➕')
-async def add_category(message: Message, state: FSMContext):
-    await state.set_state(FormAdministrator.category_name)
-    await message.answer('Category nomini kiriting 👇🏻', reply_markup=ReplyKeyboardRemove())
-
-
-@admin_router.message(FormAdministrator.category_name)
-async def add_category(message: Message, state: FSMContext) -> None:
-    category = db['categories']
-    category[str(uuid4())] = message.text
-    db['categories'] = category
-    await Category.create(name=message.text)
-    await state.clear()
-    await message.answer("Catgory Bazaga Saqlandi ✅", reply_markup=admin_buttons())
 
 
 @admin_router.message(F.text == "Product ➖ (🗑 o'chirish)")
