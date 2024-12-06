@@ -16,9 +16,9 @@ def main_links_buttons() -> InlineKeyboardMarkup:
 
 def admin_buttons() -> ReplyKeyboardMarkup:
     rkb = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text='Product+'), KeyboardButton(text='Category+')],
-                  [KeyboardButton(text='delete product'), KeyboardButton(text='delete category')],
-                  [KeyboardButton(text='📚 Kitoblar')]],
+        keyboard=[[KeyboardButton(text='📚 Kitoblar')],
+                  [KeyboardButton(text='Product ➕'), KeyboardButton(text='Category ➕')],
+                  [KeyboardButton(text="Product ➖ (🗑 o'chirish)"), KeyboardButton(text="Category ➖ (🗑 o'chirish)")]],
         resize_keyboard=True)
     return rkb
 

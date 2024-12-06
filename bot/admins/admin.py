@@ -20,7 +20,13 @@ admin_router.message.filter(ChatTypeFilter([ChatType.PRIVATE]), IsAdmin())
 
 @admin_router.message(CommandStart())
 async def start_for_admin(message: Message):
-    await message.answer('Assalomu aleykum Admin Tanlovingiz ❕', reply_markup=admin_buttons())
+    await message.answer(f'Assalomu aleykum {message.from_user.full_name} 🫡 Tanlovingiz (Admin) ❕',
+                         reply_markup=admin_buttons())
+
+
+@admin_router.message(F.text == '📚 Kitoblar')
+async def books_handler(message: Message) -> None:
+    await message.answer('Categoriyalardan birini tanlang 👇🏻', reply_markup=show_category(message.from_user.id))
 
 
 class FormAdministrator(StatesGroup):
@@ -38,7 +44,7 @@ class FormAdministrator(StatesGroup):
 storage = {}
 
 
-@admin_router.message(F.text == 'Product+')
+@admin_router.message(F.text == 'Product ➕')
 async def add_product(message: Message, state: FSMContext):
     if not db['categories']:
         await message.answer("Product qo'shishdan avval Category kiritish zarur ⁉️")
@@ -99,7 +105,7 @@ async def add_product(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer('Saqlandi ✅', reply_markup=admin_buttons())
 
 
-@admin_router.message(F.text == 'Category+')
+@admin_router.message(F.text == 'Category ➕')
 async def add_category(message: Message, state: FSMContext):
     await state.set_state(FormAdministrator.category)
     await message.answer('Category nomini kiriting 👇🏻', reply_markup=ReplyKeyboardRemove())
@@ -115,7 +121,7 @@ async def add_category(message: Message, state: FSMContext) -> None:
     await message.answer("Catgory Bazaga Saqlandi ✅", reply_markup=admin_buttons())
 
 
-@admin_router.message(F.text == 'delete product')
+@admin_router.message(F.text == "Product ➖ (🗑 o'chirish)")
 async def category_delete(message: Message, state: FSMContext) -> None:
     await message.answer('Tanlang', reply_markup=ReplyKeyboardRemove())
     await message.reply('👇🏻', reply_markup=show_category(message.from_user.id))
@@ -132,7 +138,7 @@ async def product_delete(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer('Product deleted ✅', reply_markup=admin_buttons())
 
 
-@admin_router.message(F.text == 'Delete category')
+@admin_router.message(F.text == "Category ➖ (🗑 o'chirish)")
 async def category_delete(message: Message, state: FSMContext) -> None:
     await message.answer('Tanlang', reply_markup=ReplyKeyboardRemove())
     await message.reply('👇🏻', reply_markup=show_category(message.from_user.id))

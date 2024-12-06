@@ -2,7 +2,7 @@ from aiogram import Bot
 from aiogram.filters import Filter
 from aiogram.types import Message
 
-from bot.config import ADMIN_LIST
+from db import User
 
 
 class ChatTypeFilter(Filter):
@@ -16,4 +16,4 @@ class ChatTypeFilter(Filter):
 class IsAdmin(Filter):
 
     async def __call__(self, message: Message, bot: Bot) -> bool:
-        return message.from_user.id in ADMIN_LIST
+        return True if await User.is_admin(telegram_id=message.from_user.id) else False

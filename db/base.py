@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import delete as sqlalchemy_delete, Column, DateTime, update as sqlalchemy_update
+from sqlalchemy import delete as sqlalchemy_delete, Column, DateTime, update as sqlalchemy_update, and_
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, AsyncAttrs
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.future import select
@@ -94,6 +94,14 @@ class AbstractClass:
     @classmethod
     async def get_all(cls):
         return (await db.execute(select(cls))).scalars()
+
+    @classmethod
+    async def is_admin(cls, telegram_id):
+        query = select(cls).where(
+            and_(cls.telegram_id == telegram_id, cls.type == "ADMIN")
+        )
+
+        return (await db.execute(query)).scalars().first()
 
 
 class CreatedModel(Base, AbstractClass):
