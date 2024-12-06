@@ -12,6 +12,7 @@ from bot.config import db
 from bot.filters.is_admin import ChatTypeFilter, IsAdmin
 from bot.keyboards import show_category, admin_buttons
 from bot.utils.uploader import make_url
+from db.models.users import Category, Product
 
 admin_router = Router()
 admin_router.message.filter(ChatTypeFilter([ChatType.PRIVATE]), IsAdmin())
@@ -19,7 +20,7 @@ admin_router.message.filter(ChatTypeFilter([ChatType.PRIVATE]), IsAdmin())
 
 @admin_router.message(CommandStart())
 async def start_for_admin(message: Message):
-    await message.answer('Tanlovingiz ❕', reply_markup=admin_buttons())
+    await message.answer('Assalomu aleykum Admin Tanlovingiz ❕', reply_markup=admin_buttons())
 
 
 class FormAdministrator(StatesGroup):
@@ -86,6 +87,13 @@ async def add_product(callback: CallbackQuery, state: FSMContext):
     product = db['products']
     product[str(uuid4())] = storage
     db['products'] = product
+    await Product.create(
+        title=state.set_state(FormAdministrator.product_name),
+        image=state.set_state(FormAdministrator.product_photo),
+        description=state.set_state(FormAdministrator.product_description),
+        price=state.set_state(FormAdministrator.product_price),
+        # quantity=state.set_state(FormAdministrator.product_quantity),
+    )
     await state.clear()
     await callback.message.delete()
     await callback.message.answer('Saqlandi ✅', reply_markup=admin_buttons())
@@ -102,6 +110,7 @@ async def add_category(message: Message, state: FSMContext) -> None:
     category = db['categories']
     category[str(uuid4())] = message.text
     db['categories'] = category
+    await Category.create(name=message.text)
     await state.clear()
     await message.answer("Catgory Bazaga Saqlandi ✅", reply_markup=admin_buttons())
 
@@ -140,6 +149,7 @@ async def category_delete(callback: CallbackQuery, state: FSMContext) -> None:
     category = db['categories']
     category.pop(callback.data)
     db['categories'] = category
+    # await Category.delete(callback.data)
     await state.clear()
     await callback.message.delete()
     await callback.message.answer(text="Categoryga tegishli bo'lgan product va category o'chirildi ✅",
