@@ -9,6 +9,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from bot.config.conf import db
 from bot.keyboards import show_category, make_plus_minus, main_buttons, lang_commands, \
     main_links_buttons
+from db import Product, Category
 from db.models import User
 
 main_router = Router()
@@ -68,13 +69,14 @@ async def social_handler(message: Message) -> None:
 
 @main_router.message(F.text == __('📚 Kitoblar'))
 async def books_handler(message: Message) -> None:
-    await message.answer(_('Categoriyalardan birini tanlang 👇🏻'), reply_markup=show_category(message.from_user.id))
+    await message.answer(_('Categoriyalardan birini tanlang 👇🏻'),
+                         reply_markup=await show_category(message.from_user.id))
 
 
 @main_router.callback_query(F.data.startswith('orqaga'))
 async def back_handler(callback: CallbackQuery):
     await callback.message.edit_text(_('Categoriyalardan birini tanlang 👇🏻'),
-                                     reply_markup=show_category(callback.from_user.id))
+                                     reply_markup=await show_category(callback.from_user.id))
 
 
 @main_router.message(F.text == __("📞 Biz bilan bog'lanish"))
@@ -102,11 +104,13 @@ async def answer_inline_query(message: Message):
 
 @main_router.callback_query()
 async def product_handler(callback: CallbackQuery):
-    if callback.data in db['categories']:
+    products = await Product.get_all()
+    categories = await Category.get_all()
+    if callback.data in categories:
         ikb = InlineKeyboardBuilder()
-        for key, val in db['products'].items():
-            if val['category_id'] == callback.data:
-                ikb.add(InlineKeyboardButton(text=val['name'], callback_data=key))
+        for product in products:
+            if product.category_id == callback.data:
+                ikb.add(InlineKeyboardButton(text=product.title, callback_data=product.id))
         if str(callback.from_user.id) in db['baskets']:
             ikb.add(InlineKeyboardButton(text=f'🛒 Savat ({len(db["baskets"][str(callback.from_user.id)])})',
                                          callback_data='savat'))
@@ -119,42 +123,3 @@ async def product_handler(callback: CallbackQuery):
         await callback.message.delete()
         await callback.message.answer_photo(photo=product['image'], caption=product['text'],
                                             reply_markup=ikb.as_markup())
-
-
-# @main_router.callback_query()
-# async def product_handler(callback: CallbackQuery):
-#     # Fetch all categories
-#     categories = await Category.get_all()
-#     categories_ids = [str(category.id) for category in categories]  # Convert IDs to strings for comparison
-#
-#     if callback.data in categories_ids:
-#         ikb = InlineKeyboardBuilder()
-#         # Fetch all products
-#         products = await Product.get_all()
-#         for product in products:
-#             if str(product.category_id) == callback.data:  # Compare as strings
-#                 ikb.add(InlineKeyboardButton(text=product.title, callback_data=str(product.id)))
-#
-#         # Add basket button if available
-#         user_id = str(callback.from_user.id)
-#         if user_id in db.get('baskets', {}):  # Safely access 'baskets' with .get()
-#             basket_count = len(db['baskets'][user_id])
-#             ikb.add(InlineKeyboardButton(text=f'🛒 Savat ({basket_count})', callback_data='savat'))
-#
-#         # Add back button
-#         ikb.add(InlineKeyboardButton(text=_("◀️ orqaga"), callback_data='orqaga'))
-#         ikb.adjust(2, repeat=True)
-#
-#         # Edit message with categories
-#         category_name = db['categories'].get(callback.data, "Unknown Category")
-#         await callback.message.edit_text(category_name, reply_markup=ikb.as_markup())
-#
-#     elif callback.data in db.get('products', {}):  # Safely access 'products'
-#         product = db['products'][callback.data]
-#         ikb = make_plus_minus(1, callback.data)  # Assuming make_plus_minus is defined elsewhere
-#         await callback.message.delete()
-#         await callback.message.answer_photo(
-#             photo=product['image'],
-#             caption=product['text'],
-#             reply_markup=ikb.as_markup()
-#         )

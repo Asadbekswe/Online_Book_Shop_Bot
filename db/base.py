@@ -81,12 +81,12 @@ class AbstractClass:
         return (await db.execute(query)).scalars()
 
     @classmethod
-    async def get_with_telegram_id(cls, telegram_id: int):
+    async def get_with_telegram_id(cls, telegram_id):
         query = select(cls).where(cls.telegram_id == telegram_id)
         return (await db.execute(query)).scalar()
 
     @classmethod
-    async def delete(cls, id_: int):
+    async def delete(cls, id_):
         query = sqlalchemy_delete(cls).where(cls.id == id_)
         await db.execute(query)
         await cls.commit()
@@ -96,13 +96,12 @@ class AbstractClass:
         return (await db.execute(select(cls))).scalars()
 
     @classmethod
-    async def is_admin(cls, telegram_id: int):
+    async def is_admin(cls, telegram_id):
         query = select(cls).where(
             and_(cls.telegram_id == telegram_id, cls.type == "ADMIN")
         )
 
         return (await db.execute(query)).scalars().first()
-
 
 
 class CreatedModel(Base, AbstractClass):

@@ -1,12 +1,11 @@
 from enum import Enum
-from typing import List
 
-from sqlalchemy import ForeignKey, BigInteger, VARCHAR, Float, SMALLINT, Enum as SQLEnum
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
+from sqlalchemy import BigInteger, VARCHAR
+from sqlalchemy import Enum as SQLEnum
+from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from db.base import CreatedModel
+from db.models.shop import Order
 
 
 class User(CreatedModel):
@@ -22,5 +21,4 @@ class User(CreatedModel):
     telegram_id: Mapped[int] = mapped_column(BigInteger)
     phone_number: Mapped[str] = mapped_column(VARCHAR(255), nullable=True)
     type: Mapped[Type] = mapped_column(SQLEnum(Type), default=Type.USER)
-
-
+    orders: Mapped[list['Order']] = relationship('Order', back_populates='user')

@@ -17,9 +17,7 @@ admin_router = Router()
 admin_router.message.filter(ChatTypeFilter([ChatType.PRIVATE]), IsAdmin())
 
 MEDIA_DIRECTORY = './media'
-
 os.makedirs(MEDIA_DIRECTORY, exist_ok=True)
-
 
 class FormAdministrator(StatesGroup):
     product_title = State()
@@ -45,7 +43,7 @@ async def start_for_admin(message: Message):
 
 @admin_router.message(F.text == '📚 Kitoblar')
 async def books_handler(message: Message) -> None:
-    await message.answer('Categoriyalardan birini tanlang 👇🏻', reply_markup=show_category(message.from_user.id))
+    await message.answer('Categoriyalardan birini tanlang 👇🏻', reply_markup=await show_category(message.from_user.id))
 
 
 @admin_router.message(F.text == 'Category ➕')
@@ -89,16 +87,16 @@ async def add_product_title(message: Message, state: FSMContext):
 
 @admin_router.message(FormAdministrator.product_image)
 async def add_product_image(message: Message, state: FSMContext, bot: Bot):
-    file = await message.bot.get_file(message.photo[-1].file_id)
-
-    file_path = os.path.join(MEDIA_DIRECTORY, f"{file.file_id}.jpg")
-    await message.bot.download(file.file_id, file_path)
-    with open(file_path, 'rb') as img_file:
-        img_bytes = img_file.read()
-
-    await state.update_data(product_image=file_path)
-    await state.set_state(FormAdministrator.product_description)
-    await message.answer("Product 📝 description kiriting 👇🏻")
+    try:
+        file = await bot.get_file(message.photo[-1].file_id)
+        file_name = f"{file.file_unique_id}.jpg"
+        file_path = os.path.join(MEDIA_DIRECTORY, file_name)
+        await bot.download_file(file.file_path, file_path)
+        await state.update_data(product_image=file_path)
+        await state.set_state(FormAdministrator.product_description)
+        await message.answer("Product 📝 description kiriting 👇🏻")
+    except Exception as e:
+        await message.answer(f"Xatolik yuz berdi Imageni yuklay olmadim: {str(e)}")
 
 
 @admin_router.message(FormAdministrator.product_description)
@@ -237,10 +235,18 @@ async def category_delete(callback: CallbackQuery, state: FSMContext) -> None:
 
 @admin_router.callback_query(FormAdministrator.show_category)
 async def show_product(callback: CallbackQuery, state: FSMContext):
+    # ikb = InlineKeyboardBuilder()
+    # for key, val in db['products'].items():
+    #     if val['category_id'] == callback.data:
+    #         ikb.add(InlineKeyboardButton(text=val['name'], callback_data=key))
+    # ikb.adjust(2, repeat=True)
+    # await callback.message.edit_text(db['categories'][callback.data], reply_markup=ikb.as_markup())
+    # await state.set_state(FormAdministrator.product_delete)
+    products = await Product.get_all()
     ikb = InlineKeyboardBuilder()
-    for key, val in db['products'].items():
-        if val['category_id'] == callback.data:
-            ikb.add(InlineKeyboardButton(text=val['name'], callback_data=key))
+    for product in products:
+        if product.category_id == callback.data:
+            ikb.add(InlineKeyboardButton(text=product.title, callback_data=product.id))
     ikb.adjust(2, repeat=True)
     await callback.message.edit_text(db['categories'][callback.data], reply_markup=ikb.as_markup())
     await state.set_state(FormAdministrator.product_delete)

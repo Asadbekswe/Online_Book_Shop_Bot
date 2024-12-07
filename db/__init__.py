@@ -1,2 +1,2 @@
+from db.models import User, Category, Product, Order, Basket
 from db.base import db as database, CreatedModel
-from db.models import User

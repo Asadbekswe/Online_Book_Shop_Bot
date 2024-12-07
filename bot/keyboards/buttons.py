@@ -2,8 +2,8 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardBut
 from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
-from bot.config import db
 from bot.config.conf import LINKS
+from db import Category
 
 
 def main_links_buttons() -> InlineKeyboardMarkup:
@@ -33,18 +33,15 @@ def lang_commands():
     return ikb.as_markup()
 
 
-def show_category(user_id):
+async def show_category(user_id):
     ikb = InlineKeyboardBuilder()
 
-    if 'categories' not in db:
-        db['categories'] = {}
-    for k, v in db['categories'].items():
-        ikb.add(InlineKeyboardButton(text=v, callback_data=k))
+    categories = await Category.get_all()
+    # baskets = await  Basket.get_all()
+    for category in categories:
+        ikb.add(InlineKeyboardButton(text=category.name, callback_data=str(category.id)))
     ikb.add(InlineKeyboardButton(text=_('🔍 Qidirish'), switch_inline_query_current_chat=''))
-    if 'baskets' not in db:
-        db['baskets'] = {}
-    if str(user_id) in db['baskets']:
-        ikb.add(InlineKeyboardButton(text=f'🛒 Savat ({len(db["baskets"][str(user_id)])})', callback_data='savat'))
+    ikb.add(InlineKeyboardButton(text=f'🛒 Savat ({"12312312"})', callback_data='savat'))
     ikb.adjust(2, repeat=True)
     return ikb.as_markup()
 
@@ -53,8 +50,7 @@ def make_plus_minus(quantity, product_id):
     ikb = InlineKeyboardBuilder()
     ikb.row(InlineKeyboardButton(text="➖", callback_data="change-" + product_id),
             InlineKeyboardButton(text=str(quantity), callback_data="number"),
-            InlineKeyboardButton(text="➕", callback_data="change+" + product_id)
-            )
+            InlineKeyboardButton(text="➕", callback_data="change+" + product_id))
     ikb.row(InlineKeyboardButton(text=_("◀️Orqaga"), callback_data="categoryga"),
             InlineKeyboardButton(text=_('🛒 Savatga qo\'shish'), callback_data="savatga" + product_id + str(quantity)))
     return ikb

@@ -26,7 +26,7 @@ async def to_category(callback: CallbackQuery):
     quantity = 1
     await callback.message.delete()
     await callback.message.answer(_('Categoriyalardan birini tanlang 👇🏻'),
-                                  reply_markup=show_category(callback.from_user.id))
+                                  reply_markup=await show_category(callback.from_user.id))
 
 
 @basket_router.callback_query(F.data.startswith('savatga'))
