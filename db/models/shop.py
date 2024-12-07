@@ -58,3 +58,11 @@ class Basket(CreatedModel):
     price: Mapped[float] = mapped_column(Float, nullable=False)
     order: Mapped['Order'] = relationship('Order', back_populates='items')
     product: Mapped['Product'] = relationship('Product')
+
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    user: Mapped['User'] = relationship('User', back_populates='baskets')
+
+    @classmethod
+    async def get_products_by_category_id(cls, user_id):
+        query = select(cls).where(cls.user_id == user_id)
+        return (await db.execute(query)).scalars()

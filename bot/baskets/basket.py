@@ -5,19 +5,20 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bot.config import db
 from bot.keyboards import show_category, make_plus_minus
+from db import Basket
 
 basket_router = Router()
 
 
-def basket_msg(user_id):
-    basket_of_user = db['baskets'][str(user_id)]
+async def basket_msg(user_id):
+    baskets = [i for i in await Basket.get_products_by_user(user_id)]
     msg = f'🛒 Savat \n\n'
     all_sum = 0
-    for key, val in enumerate(basket_of_user.values()):
-        summa = float(val['quantity']) * float(val['price'])
-        msg += f'{key + 1}. {val["product_name"]} \n{val["quantity"]} x {val["price"]} = {str(summa)} so\'m\n\n'
+    for basket in baskets:
+        summa = float(basket.quantity) * float(basket.price)
+        msg += f"{basket + 1}. {basket.product_name} \n{basket.quantity} x {basket.price} = {str(summa)} sum"
         all_sum += summa
-    msg += _("Jami: {all_sum} so\'m").format(all_sum=all_sum)
+    msg += _("Jami: {all_sum} sum").format(all_sum=all_sum)
     return msg
 
 
@@ -75,7 +76,7 @@ async def change_plus(callback: CallbackQuery):
 
 @basket_router.callback_query(F.data.startswith('savat'))
 async def basket(callback: CallbackQuery):
-    msg = basket_msg(callback.from_user.id)
+    msg = await basket_msg(callback.from_user.id)
     ikb = InlineKeyboardBuilder()
     ikb.row(InlineKeyboardButton(text=_('❌ Savatni tozalash'), callback_data='clear'))
     ikb.row(InlineKeyboardButton(text=_('✅ Buyurtmani tasdiqlash'), callback_data='confirm'))

@@ -84,7 +84,7 @@ async def phone_number(message: Message, state: FSMContext):
         await message.answer(_("Telefon raqamingizni olishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring."))
         return
 
-    msg = f"{basket_msg(message.from_user.id)}\nTelefon raqamingiz: {message.contact.phone_number}\n\n<i>Buyurtma berasizmi?</i>"
+    msg = f"{await basket_msg(message.from_user.id)}\nTelefon raqamingiz: {message.contact.phone_number}\n\n<i>Buyurtma berasizmi?</i>"
     ikb = InlineKeyboardBuilder()
     ikb.row(
         InlineKeyboardButton(text=_("❌ Yo'q"), callback_data='canceled_order'),
