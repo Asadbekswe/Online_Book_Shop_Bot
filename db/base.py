@@ -104,6 +104,7 @@ class AbstractClass:
         return (await db.execute(query)).scalars().first()
 
 
+
 class CreatedModel(Base, AbstractClass):
     __abstract__ = True
     created_at = Column(DateTime(), default=datetime.utcnow)

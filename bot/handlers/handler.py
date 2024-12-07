@@ -119,3 +119,42 @@ async def product_handler(callback: CallbackQuery):
         await callback.message.delete()
         await callback.message.answer_photo(photo=product['image'], caption=product['text'],
                                             reply_markup=ikb.as_markup())
+
+
+# @main_router.callback_query()
+# async def product_handler(callback: CallbackQuery):
+#     # Fetch all categories
+#     categories = await Category.get_all()
+#     categories_ids = [str(category.id) for category in categories]  # Convert IDs to strings for comparison
+#
+#     if callback.data in categories_ids:
+#         ikb = InlineKeyboardBuilder()
+#         # Fetch all products
+#         products = await Product.get_all()
+#         for product in products:
+#             if str(product.category_id) == callback.data:  # Compare as strings
+#                 ikb.add(InlineKeyboardButton(text=product.title, callback_data=str(product.id)))
+#
+#         # Add basket button if available
+#         user_id = str(callback.from_user.id)
+#         if user_id in db.get('baskets', {}):  # Safely access 'baskets' with .get()
+#             basket_count = len(db['baskets'][user_id])
+#             ikb.add(InlineKeyboardButton(text=f'🛒 Savat ({basket_count})', callback_data='savat'))
+#
+#         # Add back button
+#         ikb.add(InlineKeyboardButton(text=_("◀️ orqaga"), callback_data='orqaga'))
+#         ikb.adjust(2, repeat=True)
+#
+#         # Edit message with categories
+#         category_name = db['categories'].get(callback.data, "Unknown Category")
+#         await callback.message.edit_text(category_name, reply_markup=ikb.as_markup())
+#
+#     elif callback.data in db.get('products', {}):  # Safely access 'products'
+#         product = db['products'][callback.data]
+#         ikb = make_plus_minus(1, callback.data)  # Assuming make_plus_minus is defined elsewhere
+#         await callback.message.delete()
+#         await callback.message.answer_photo(
+#             photo=product['image'],
+#             caption=product['text'],
+#             reply_markup=ikb.as_markup()
+#         )

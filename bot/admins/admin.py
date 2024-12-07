@@ -11,7 +11,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from bot.config import db
 from bot.filters.is_admin import ChatTypeFilter, IsAdmin
 from bot.keyboards import show_category, admin_buttons
-from db.models.users import Category, Product
+from db.models import Category, Product
 
 admin_router = Router()
 admin_router.message.filter(ChatTypeFilter([ChatType.PRIVATE]), IsAdmin())

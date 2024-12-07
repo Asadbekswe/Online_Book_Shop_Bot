@@ -22,22 +22,5 @@ class User(CreatedModel):
     telegram_id: Mapped[int] = mapped_column(BigInteger)
     phone_number: Mapped[str] = mapped_column(VARCHAR(255), nullable=True)
     type: Mapped[Type] = mapped_column(SQLEnum(Type), default=Type.USER)
-    # location: Mapped[""]
 
 
-class Category(CreatedModel):
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    name: Mapped[str] = mapped_column(VARCHAR(20))
-    products: Mapped[List["Product"]] = relationship(back_populates="category")
-
-
-class Product(CreatedModel):
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    title: Mapped[str] = mapped_column(VARCHAR(20))
-    image: Mapped[str] = mapped_column(VARCHAR(255))
-    description: Mapped[str] = mapped_column(VARCHAR(255))
-    price: Mapped[float] = mapped_column(Float())
-    discount_price: Mapped[float] = mapped_column(Float(), default=0.0)
-    quantity: Mapped[int] = mapped_column(SMALLINT, default=0)
-    category_id: Mapped[int] = mapped_column(ForeignKey("categorys.id", ondelete="CASCADE"))
-    category: Mapped["Category"] = relationship("Category", back_populates="products", cascade="all, delete")
