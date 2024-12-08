@@ -1,18 +1,27 @@
 from datetime import datetime
-
-from sqlalchemy import delete as sqlalchemy_delete, Column, DateTime, update as sqlalchemy_update, and_
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, AsyncAttrs
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.future import select
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from sqlalchemy.types import TypeDecorator, DateTime
+import pytz
+from sqlalchemy import delete as sqlalchemy_delete, update as sqlalchemy_update, select, func, BigInteger, and_
+from sqlalchemy.ext.asyncio import AsyncAttrs, create_async_engine, AsyncSession
+from sqlalchemy.orm import DeclarativeBase, declared_attr, sessionmaker, Mapped, mapped_column
 
 from config import conf
 
 
 class Base(AsyncAttrs, DeclarativeBase):
+
     @declared_attr
     def __tablename__(self) -> str:
-        return self.__name__.lower() + 's'
+        __name = self.__name__[:1]
+        for i in self.__name__[1:]:
+            if i.isupper():
+                __name += '_'
+            __name += i
+        __name = __name.lower()
+
+        if __name.endswith('y'):
+            __name = __name[:-1] + 'ie'
+        return __name + 's'
 
 
 class AsyncDatabaseSession:
@@ -48,9 +57,9 @@ class AbstractClass:
     async def commit():
         try:
             await db.commit()
-        except Exception as e:
-            print(e)
+        except Exception:
             await db.rollback()
+            raise
 
     @classmethod
     async def create(cls, **kwargs):  # Create
@@ -104,7 +113,33 @@ class AbstractClass:
         return (await db.execute(query)).scalars().first()
 
 
-class CreatedModel(Base, AbstractClass):
+class BaseModel(Base, AbstractClass):
     __abstract__ = True
-    created_at = Column(DateTime(), default=datetime.utcnow)
-    updated_at = Column(DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+
+    def __str__(self):
+        return f"{self.id}"
+
+
+class TimeStamp(TypeDecorator):
+    impl = DateTime(timezone=True)
+    cache_ok = True
+    TASHKENT_TIMEZONE = pytz.timezone("Asia/Tashkent")
+
+    def process_bind_param(self, value: datetime, dialect):
+        if value is None:
+            return None
+        if value.tzinfo is None:
+            value = self.TASHKENT_TIMEZONE.localize(value)
+        return value.astimezone(self.TASHKENT_TIMEZONE)
+
+    def process_result_value(self, value, dialect):
+        if value is not None:
+            return value.astimezone(self.TASHKENT_TIMEZONE)
+        return value
+
+
+class TimeBaseModel(BaseModel):
+    __abstract__ = True
+    created_at: Mapped[TimeStamp] = mapped_column(TimeStamp, server_default=func.now())
+    updated_at: Mapped[TimeStamp] = mapped_column(TimeStamp, server_default=func.now(), server_onupdate=func.now())
