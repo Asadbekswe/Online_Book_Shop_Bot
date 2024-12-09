@@ -31,6 +31,8 @@ class User(TimeBaseModel):
 class Category(TimeBaseModel):
     name: Mapped[str] = mapped_column(VARCHAR(255))
     products: Mapped[list['Product']] = relationship('Product', back_populates='category')
+    def __repr__(self):
+        return self.name
 
 
 class Product(TimeBaseModel):
@@ -83,7 +85,3 @@ class Basket(TimeBaseModel):
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
     user: Mapped['User'] = relationship('User', back_populates='baskets')
 
-    @classmethod
-    async def get_products_by_category_id(cls, user_id):
-        query = select(cls).where(cls.user_id == user_id)
-        return (await db.execute(query)).scalars()
