@@ -1,9 +1,10 @@
 from datetime import datetime
-from sqlalchemy.types import TypeDecorator, DateTime
+
 import pytz
 from sqlalchemy import delete as sqlalchemy_delete, update as sqlalchemy_update, select, func, BigInteger, and_
 from sqlalchemy.ext.asyncio import AsyncAttrs, create_async_engine, AsyncSession
 from sqlalchemy.orm import DeclarativeBase, declared_attr, sessionmaker, Mapped, mapped_column
+from sqlalchemy.types import TypeDecorator, DateTime
 
 from config import conf
 
@@ -85,6 +86,11 @@ class AbstractClass:
         return (await db.execute(query)).scalar()
 
     @classmethod
+    async def get_uuid(cls, uuid):
+        query = select(cls).where(cls.uuid == uuid)
+        return (await db.execute(query)).scalar()
+
+    @classmethod
     async def get_products_by_user(cls, user_id):
         query = select(cls).where(cls.user_id == user_id)
         return (await db.execute(query)).scalars()
@@ -111,6 +117,16 @@ class AbstractClass:
         )
 
         return (await db.execute(query)).scalars().first()
+
+    @classmethod
+    async def get_name(cls, id_: int):
+        query = select(cls).where(cls.id == id_)
+        result = await db.execute(query)
+        instance = result.scalars().first()  # Get the first result
+
+        if instance:
+            return instance.name
+        return None
 
 
 class BaseModel(Base, AbstractClass):

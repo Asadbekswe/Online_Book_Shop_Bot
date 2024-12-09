@@ -35,9 +35,7 @@ def lang_commands():
 
 async def show_category(user_id):
     ikb = InlineKeyboardBuilder()
-
     categories = await Category.get_all()
-    # baskets = await  Basket.get_all()
     for category in categories:
         ikb.add(InlineKeyboardButton(text=category.name, callback_data=str(category.id)))
     ikb.add(InlineKeyboardButton(text=_('🔍 Qidirish'), switch_inline_query_current_chat=''))

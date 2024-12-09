@@ -233,20 +233,13 @@ async def category_delete(callback: CallbackQuery, state: FSMContext) -> None:
         await state.clear()
 
 
-@admin_router.callback_query(FormAdministrator.show_category)
-async def show_product(callback: CallbackQuery, state: FSMContext):
-    # ikb = InlineKeyboardBuilder()
-    # for key, val in db['products'].items():
-    #     if val['category_id'] == callback.data:
-    #         ikb.add(InlineKeyboardButton(text=val['name'], callback_data=key))
-    # ikb.adjust(2, repeat=True)
-    # await callback.message.edit_text(db['categories'][callback.data], reply_markup=ikb.as_markup())
-    # await state.set_state(FormAdministrator.product_delete)
-    products = await Product.get_all()
-    ikb = InlineKeyboardBuilder()
-    for product in products:
-        if product.category_id == callback.data:
-            ikb.add(InlineKeyboardButton(text=product.title, callback_data=product.id))
-    ikb.adjust(2, repeat=True)
-    await callback.message.edit_text(db['categories'][callback.data], reply_markup=ikb.as_markup())
-    await state.set_state(FormAdministrator.product_delete)
+# @admin_router.callback_query(FormAdministrator.show_category)
+# async def show_product(callback: CallbackQuery, state: FSMContext):
+#     products = await Product.get_all()
+#     ikb = InlineKeyboardBuilder()
+#     for product in products:
+#         if product.category_id == callback.data:
+#             ikb.add(InlineKeyboardButton(text=product.title, callback_data=str(product.category_id)))
+#     ikb.adjust(2, repeat=True)
+#     await callback.message.edit_text(text="123312312312312312312", reply_markup=ikb.as_markup())
+#     await state.set_state(FormAdministrator.product_delete)

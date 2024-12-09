@@ -2,13 +2,13 @@ from aiogram import F, Router
 from aiogram.enums import ParseMode
 from aiogram.filters import Command, CommandStart
 from aiogram.fsm.context import FSMContext
-from aiogram.types import InlineKeyboardButton, Message, CallbackQuery
+from aiogram.types import InlineKeyboardButton, Message, CallbackQuery, FSInputFile
 from aiogram.utils.i18n import gettext as _, lazy_gettext as __
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bot.config.conf import db
-from bot.keyboards import show_category, make_plus_minus, main_buttons, lang_commands, \
-    main_links_buttons
+from bot.keyboards import show_category, main_buttons, lang_commands, \
+    main_links_buttons, make_plus_minus
 from db import Product, Category
 from db.models import User
 
@@ -28,7 +28,7 @@ async def command_start_handler(message: Message) -> None:
 
 
 @main_router.message(Command(commands='help'))
-async def help_command(message: Message) -> None:
+async def command_help_handler(message: Message) -> None:
     await message.answer(_('''Buyruqlar:
 /start - Botni ishga tushirish 🫡
 /help - Yordam 📖
@@ -40,7 +40,7 @@ async def change_language(message: Message) -> None:
     await message.answer(_('Tilni tanlang  👇🏻'), reply_markup=lang_commands())
 
 
-@main_router.message(Command(commands=['language']))
+@main_router.message(Command(commands='language'))
 async def language_handler(message: Message) -> None:
     await change_language(message)
 
@@ -67,7 +67,7 @@ async def social_handler(message: Message) -> None:
     await message.answer('Biz ijtimoiy tarmoqlarda', reply_markup=main_links_buttons())
 
 
-@main_router.message(F.text == __('📚 Kitoblar'))
+@main_router.message(F.text == __("📚 Kitoblar"))
 async def books_handler(message: Message) -> None:
     await message.answer(_('Categoriyalardan birini tanlang 👇🏻'),
                          reply_markup=await show_category(message.from_user.id))
@@ -80,7 +80,7 @@ async def back_handler(callback: CallbackQuery):
 
 
 @main_router.message(F.text == __("📞 Biz bilan bog'lanish"))
-async def info_handler(message: Message) -> None:
+async def contact_us_handler(message: Message) -> None:
     text = _(
         """
         \n
@@ -93,45 +93,28 @@ async def info_handler(message: Message) -> None:
     await message.answer(text=text, parse_mode=ParseMode.HTML)
 
 
+@main_router.callback_query()
+async def product_callback_handler(callback: CallbackQuery):
+    msg = callback.data[-36:]
+    product = await Product.get_uuid(uuid=msg)
+    ikb = make_plus_minus(1, msg)
+    caption = \
+        f"""<b>{product.title}</b>\n
+    <i>{product.description}</i>
+    """
+    await callback.message.answer_photo(photo=FSInputFile(product.image), caption=caption, reply_markup=ikb.as_markup())
 
-# @main_router.callback_query()
-# async def product_handler(callback: CallbackQuery):
-#     categories = await Category.get_all()
-#     cat_ids = [i.id for i in categories]
-#     category = next((cat for cat in categories if cat.id == int(callback.data)), None)
-#     products = await Product.get_products_by_category_id(category_id=int(callback.data))
-#     if int(callback.data) in cat_ids:
-#         ikb = InlineKeyboardBuilder()
-#         for product in products:
-#             ikb.add(InlineKeyboardButton(text=product.title, callback_data=str(product.id)))
-#         if str(callback.from_user.id) in db['baskets']:
-#             ikb.add(InlineKeyboardButton(text=f'🛒 Savat ({len(db["baskets"][str(callback.from_user.id)])})',
-#                                          callback_data='savat'))
-#         ikb.add(InlineKeyboardButton(text=_("◀️ orqaga"), callback_data='orqaga'))
-#         ikb.adjust(2, repeat=True)
-#
-#         await callback.message.edit_text(text=f"{category.name}", reply_markup=ikb.as_markup())
-#     elif callback.data in db['products']:
-#         product = db['products'][callback.data]
-#         ikb = make_plus_minus(1, callback.data)
-#         await callback.message.delete()
-#         await callback.message.answer_photo(photo=product.image, caption=product.title,
-#                                             reply_markup=ikb.as_markup())
+
 @main_router.callback_query()
 async def product_handler(callback: CallbackQuery):
-    category_id = int(callback.data)
-    categories = await Category.get_all()
-    category = next((cat for cat in categories if cat.id == category_id), None)
-    if category is None:
-        await callback.message.edit_text(text="Categoriya topilmadi!", reply_markup=None)
-        return
-    products = await Product.get_products_by_category_id(category_id=category_id)
+    category_name = await Category.get_name(id_=int(callback.data))
+    products = await Product.get_products_by_category_id(category_id=int(callback.data))
     ikb = InlineKeyboardBuilder()
     for product in products:
-        ikb.add(InlineKeyboardButton(text=product.title, callback_data=str(product.id)))
-    if str(callback.from_user.id) in db['baskets']:
-        ikb.add(InlineKeyboardButton(text=f'🛒 Savat ({len(db["baskets"][str(callback.from_user.id)])})',
-                                     callback_data='savat'))
+        ikb.add(InlineKeyboardButton(text=product.title, callback_data=str(product.uuid)))
+    # if str(callback.from_user.id) in db['baskets']:
+    #     ikb.add(InlineKeyboardButton(text=f'🛒 Savat ({len(db["baskets"][str(callback.from_user.id)])})',
+    #                                  callback_data='savat'))
     ikb.add(InlineKeyboardButton(text=_("◀️ orqaga"), callback_data='orqaga'))
     ikb.adjust(2, repeat=True)
-    await callback.message.edit_text(text=f"{category.name}", reply_markup=ikb.as_markup())
+    await callback.message.edit_text(text=f"{category_name}", reply_markup=ikb.as_markup())
