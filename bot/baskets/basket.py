@@ -1,13 +1,16 @@
 from aiogram import F, Router
+from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, InlineKeyboardButton
 from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from bot.config import db
 from bot.keyboards import show_category, make_plus_minus
+from bot.states.count_state import CountState
 from db import Basket
 
 basket_router = Router()
+
+quantity = 1
 
 
 async def basket_msg(user_id):
@@ -24,58 +27,39 @@ async def basket_msg(user_id):
 
 @basket_router.callback_query(F.data.startswith('categoryga'))
 async def to_category(callback: CallbackQuery):
-    quantity = 1
     await callback.message.delete()
     await callback.message.answer(_('Categoriyalardan birini tanlang 👇🏻'),
                                   reply_markup=await show_category(callback.from_user.id))
 
 
-@basket_router.callback_query(F.data.startswith('savatga'))
+@basket_router.callback_query(F.data.startswith('add_to_card_'))
 async def to_basket(callback: CallbackQuery):
-    basket_ = db['baskets']
-    user = basket_.get(str(callback.from_user.id))
-    product_id = callback.data[7:43]
-    product = db['products'][product_id]
-    if user:
-        if user.get(product_id):
-            user[product_id]['quantity'] += int(callback.data[43:])
-        else:
-            user[product_id] = {
-                'product_name': product['name'],
-                'quantity': callback.data[43:],
-                'price': product['price']
-            }
-    else:
-        basket_[str(callback.from_user.id)] = {
-            product_id: {
-                'product_name': product['name'],
-                'quantity': int(callback.data[43:]),
-                'price': product['price']
-            }
-        }
-    db['baskets'] = basket_
+    "add_to_card_{product_id}_{quantity}"
+    product_id = callback.data.split('_')[-2]
+    quantity = callback.data.split('_')[-2]
     await to_category(callback)
 
 
-quantity = 1
-
-
-@basket_router.callback_query(F.data.startswith("change"))
-async def change_plus(callback: CallbackQuery):
-    global quantity
-    if callback.data.startswith("change+"):
-        quantity += 1
-    elif quantity < 2:
-        await callback.answer(_('Eng kamida 1 ta kitob buyurtma qilishingiz mumkin! 😊'), show_alert=True)
-        return
+@basket_router.callback_query((F.data.startswith('change-')) | (F.data.startswith('change+')), CountState.count)
+async def update_page_handler(callback: CallbackQuery, state: FSMContext):
+    data = (await state.get_data())
+    if callback.data.startswith("change-"):
+        if data['count'] > 1:
+            data['count'] -= 1
+            await state.update_data(count=data['count'])
+        else:
+            await callback.answer(_('Eng kamida 1 ta kitob buyurtma qilishingiz mumkin! 😊'), show_alert=True)
+            return
     else:
-        quantity -= 1
-    ikb = make_plus_minus(quantity, callback.data[7:])
+        data['count'] += 1
+        await state.update_data(count=data['count'])
+    ikb = make_plus_minus(data['count'], callback.data[7:])
     await callback.message.edit_reply_markup(str(callback.message.message_id), reply_markup=ikb.as_markup())
 
 
 @basket_router.callback_query(F.data.startswith('savat'))
 async def basket(callback: CallbackQuery):
+    print('Negaa')
     msg = await basket_msg(callback.from_user.id)
     ikb = InlineKeyboardBuilder()
     ikb.row(InlineKeyboardButton(text=_('❌ Savatni tozalash'), callback_data='clear'))

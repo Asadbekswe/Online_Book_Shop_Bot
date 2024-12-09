@@ -9,7 +9,7 @@ inline_router = Router()
 
 
 @inline_router.message(
-    lambda msg: msg.text is not None and str(msg.text[-36:]) == "35f22a34-25b7-4f75-b463-2390ffb24d20")
+    lambda msg: msg.text is not None and str(msg.text[-36:]) == "290f422b-ead3-4a5a-870f-e5621d152b68")
 async def answer_inline_query(message: Message):
     msg = message.text[-36:]
     product = await Product.get(id_=1)

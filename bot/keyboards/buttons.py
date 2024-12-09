@@ -39,7 +39,7 @@ async def show_category(user_id):
     categories = await Category.get_all()
     # baskets = await  Basket.get_all()
     for category in categories:
-        ikb.add(InlineKeyboardButton(text=category.name, callback_data=str(category.id)))
+        ikb.add(InlineKeyboardButton(text=category.name, callback_data=f"category_name_{category.id}"))
     ikb.add(InlineKeyboardButton(text=_('🔍 Qidirish'), switch_inline_query_current_chat=''))
     ikb.add(InlineKeyboardButton(text=f'🛒 Savat ({"12312312"})', callback_data='savat'))
     ikb.adjust(2, repeat=True)
@@ -52,7 +52,7 @@ def make_plus_minus(quantity, product_id):
             InlineKeyboardButton(text=str(quantity), callback_data="number"),
             InlineKeyboardButton(text="➕", callback_data="change+" + product_id))
     ikb.row(InlineKeyboardButton(text=_("◀️Orqaga"), callback_data="categoryga"),
-            InlineKeyboardButton(text=_('🛒 Savatga qo\'shish'), callback_data="savatga" + product_id + str(quantity)))
+            InlineKeyboardButton(text=_('🛒 Savatga qo\'shish'), callback_data=f"add_to_card_{product_id}_{quantity}"))
     return ikb
 
 
