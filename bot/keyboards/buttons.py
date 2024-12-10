@@ -3,7 +3,7 @@ from aiogram.utils.i18n import gettext as _
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 from bot.config.conf import LINKS
-from db import Category
+from db import Category, Basket
 
 
 def main_links_buttons() -> InlineKeyboardMarkup:
@@ -34,13 +34,14 @@ def lang_commands():
     return ikb.as_markup()
 
 
-async def show_category(user_id):
+async def show_category(user_telegram_id):
     ikb = InlineKeyboardBuilder()
     categories = await Category.get_all()
+    amount = await Basket.count_grouped_by_user_telegram_id(user_telegram_id)
     for category in categories:
         ikb.add(InlineKeyboardButton(text=category.name, callback_data=f"category_name_{category.id}"))
     ikb.add(InlineKeyboardButton(text=_('🔍 Qidirish'), switch_inline_query_current_chat=''))
-    ikb.add(InlineKeyboardButton(text=f'🛒 Savat ({"12312312"})', callback_data='savat'))
+    ikb.add(InlineKeyboardButton(text=f'🛒 Savat ({(amount)})', callback_data='savat'))
     ikb.adjust(2, repeat=True)
     return ikb.as_markup()
 

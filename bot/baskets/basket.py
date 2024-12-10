@@ -1,4 +1,5 @@
 from aiogram import F, Router
+from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, InlineKeyboardButton
 from aiogram.utils.i18n import gettext as _
@@ -14,14 +15,13 @@ quantity = 1
 
 
 async def basket_msg(user_id):
-    baskets = [i for i in await Basket.get_products_by_user(user_id)]
     msg = f'🛒 Savat \n\n'
     all_sum = 0
-    for basket in baskets:
-        summa = float(basket.quantity) * float(basket.price)
-        msg += f"{basket + 1}. {basket.product_name} \n{basket.quantity} x {basket.price} = {str(summa)} sum"
+    for basket in (await Basket.get_products_by_user(user_id)):
+        summa = float(basket.quantity) * float(basket.product.price)
+        msg += f"<i>{basket.product.title}</i> \n{basket.quantity} x {basket.product.price} = {str(summa)} sum\n\n"
         all_sum += summa
-    msg += _("Jami: {all_sum} sum").format(all_sum=all_sum)
+    msg += _("<b>Jami: {all_sum} sum</b>").format(all_sum=all_sum)
     return msg
 
 
@@ -33,22 +33,16 @@ async def to_category(callback: CallbackQuery):
 
 
 @basket_router.callback_query(F.data.startswith('add_to_card_'))
-async def to_basket(callback: CallbackQuery, state: FSMContext):
-    "add_to_card_{product_id}_{quantity}"
-    # data = (await state.get_data())
-    # print(data['product_id'])
-    product_id = callback.data.split('_')[-2]
-    quantity = callback.data.split('_')[-1]
+async def to_basket(callback: CallbackQuery):
+    product_id = int(callback.data.split('_')[-2])
+    quantity = int(callback.data.split('_')[-1])
+
     product = await Product.get(id_=product_id)
     await Basket.create(
-        order_id=1,
         product_id=product_id,
-        product_name=product.title,
         quantity=quantity,
-        price=product.price,
-        user_id=callback.message.from_user.id
+        user_telegram_id=callback.from_user.id
     )
-    print("YARATDIM ASAD AKA")
     await to_category(callback)
 
 
@@ -72,10 +66,9 @@ async def update_page_handler(callback: CallbackQuery, state: FSMContext):
 
 @basket_router.callback_query(F.data.startswith('savat'))
 async def basket(callback: CallbackQuery):
-    print('Negaa')
     msg = await basket_msg(callback.from_user.id)
     ikb = InlineKeyboardBuilder()
     ikb.row(InlineKeyboardButton(text=_('❌ Savatni tozalash'), callback_data='clear'))
     ikb.row(InlineKeyboardButton(text=_('✅ Buyurtmani tasdiqlash'), callback_data='confirm'))
     ikb.row(InlineKeyboardButton(text=_('◀️ orqaga'), callback_data='categoryga'))
-    await callback.message.edit_text(msg, reply_markup=ikb.as_markup())
+    await callback.message.edit_text(msg, reply_markup=ikb.as_markup(), parse_mode=ParseMode.HTML)

@@ -1,10 +1,9 @@
-import uuid
 from enum import Enum
+from typing import List
 
-from sqlalchemy import BigInteger, VARCHAR, Column, Integer
+from sqlalchemy import BigInteger, VARCHAR, Integer
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import Float, ForeignKey, String, Text
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.future import select
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
@@ -21,11 +20,20 @@ class User(TimeBaseModel):
     first_name: Mapped[str] = mapped_column(VARCHAR(255))
     last_name: Mapped[str] = mapped_column(VARCHAR(255), nullable=True)
     username: Mapped[str] = mapped_column(VARCHAR(255), nullable=True)
-    telegram_id: Mapped[int] = mapped_column(BigInteger)
+    telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
     phone_number: Mapped[str] = mapped_column(VARCHAR(255), nullable=True)
     type: Mapped[Type] = mapped_column(SQLEnum(Type), default=Type.USER)
-    orders: Mapped[list['Order']] = relationship('Order', back_populates='user')
-    baskets: Mapped['Basket'] = relationship('Basket', back_populates='user')
+    orders: Mapped[List['Order']] = relationship(back_populates='user', cascade="all, delete")
+    baskets: Mapped[List['Basket']] = relationship(back_populates='user', cascade="all, delete")
+    order_items: Mapped[List['OrderItem']] = relationship(back_populates='user', cascade="all, delete")
+
+
+class Basket(TimeBaseModel):
+    quantity: Mapped[int] = mapped_column(Integer, default=1)
+    user_telegram_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('users.telegram_id'))
+    user: Mapped[List['User']] = relationship(back_populates="baskets", cascade="all, delete")
+    product: Mapped[List['Product']] = relationship(back_populates="baskets", cascade="all, delete")
+    product_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('products.id'))
 
 
 class Category(TimeBaseModel):
@@ -37,7 +45,6 @@ class Category(TimeBaseModel):
 
 
 class Product(TimeBaseModel):
-    uuid = Column(UUID(as_uuid=True), default=uuid.uuid4, unique=True, nullable=False)
     title: Mapped[str] = mapped_column(VARCHAR(255))
     image: Mapped[str] = mapped_column(Text)
     description: Mapped[str] = mapped_column(Text)
@@ -46,9 +53,8 @@ class Product(TimeBaseModel):
     quantity: Mapped[int] = mapped_column(BigInteger, default=0)
     category_id: Mapped[int] = mapped_column(BigInteger, ForeignKey(Category.id, ondelete='CASCADE'))
     category: Mapped['Category'] = relationship('Category', back_populates='products')
-
-    def __repr__(self):
-        return f"<Product(uuid={self.uuid}, title={self.title})>"
+    baskets: Mapped[List['Basket']] = relationship(back_populates='product', cascade="all, delete")
+    order_items: Mapped[List['OrderItem']] = relationship(back_populates='product', cascade="all, delete")
 
     @classmethod
     async def get_products_by_category_id(cls, category_id):
@@ -64,24 +70,24 @@ class Order(TimeBaseModel):
         RETURNED = "⬅️ Qaytarilgan"
         CANCELLED = "❌ Bekor qilingan"
 
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    user_telegram_id: Mapped[int] = mapped_column(BigInteger,ForeignKey('users.telegram_id'), nullable=False)
     phone_number: Mapped[str] = mapped_column(String(20), nullable=False)
-    order_status: Mapped[str] = mapped_column(
-        String(50), default=Status.PENDING
+    order_status: Mapped[Status] = mapped_column(
+        SQLEnum(Status), default=Status.PENDING
     )
     total_amount: Mapped[float] = mapped_column(Float, nullable=False)
     user: Mapped["User"] = relationship('User', back_populates='orders')
-    items: Mapped[list['Basket']] = relationship('Basket', back_populates='order', cascade="all, delete")
+    order_items: Mapped[List["OrderItem"]] = relationship("OrderItem", back_populates="order", cascade="all, delete")
 
 
-class Basket(TimeBaseModel):
-    order_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('orders.id'), nullable=True)
-    product_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('products.id'), nullable=False)
-    product_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
-    price: Mapped[float] = mapped_column(Float, nullable=False)
-    order: Mapped['Order'] = relationship('Order', back_populates='items')
-    product: Mapped['Product'] = relationship('Product')
+class OrderItem(TimeBaseModel):
+    quantity: Mapped[int] = mapped_column(Integer, default=1)
 
-    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('users.id'), nullable=False)
-    user: Mapped['User'] = relationship('User', back_populates='baskets')
+    order_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('orders.id'))
+    order: Mapped["Order"] = relationship(back_populates='order_items', cascade="all, delete")
+
+    user_telegram_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('users.telegram_id'))
+    user: Mapped["User"] = relationship(back_populates="order_items", cascade="all, delete")
+
+    product: Mapped["Product"] = relationship(back_populates="order_items", cascade="all, delete")
+    product_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('products.id'))

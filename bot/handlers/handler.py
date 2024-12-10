@@ -7,7 +7,6 @@ from aiogram.types import Message, FSInputFile
 from aiogram.utils.i18n import gettext as _, lazy_gettext as __
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from bot.config.conf import db
 from bot.keyboards import show_category, main_buttons, lang_commands, \
     main_links_buttons, make_plus_minus
 from bot.states.count_state import CountState
@@ -20,11 +19,14 @@ main_router = Router()
 @main_router.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
     msg = _('Assalomu alaykum! Tanlovingiz 👇🏻.')
-    print(db['users'])
     user_data = message.from_user.model_dump(include={'id', 'first_name', 'last_name', 'username'})
     if not await User.get_with_telegram_id(telegram_id=message.from_user.id):
-        await User.create(first_name=user_data['first_name'], last_name=user_data['last_name'],
-                          username=user_data['username'], telegram_id=user_data['id'])
+        await User.create(
+            first_name=user_data['first_name'],
+            last_name=user_data['last_name'],
+            username=user_data['username'],
+            telegram_id=user_data['id']
+        )
         msg = _('Assalomu alaykum! \nXush kelibsiz!')
     await message.answer(text=msg, reply_markup=main_buttons())
 
@@ -139,10 +141,8 @@ async def category_handler(callback: CallbackQuery, state: FSMContext):
 
 
 @main_router.callback_query(F.data.startswith('product_name_'))
-async def product_handler(callback: CallbackQuery, state: FSMContext):
+async def product_handler(callback: CallbackQuery):
     product_id = int(callback.data.split('product_name_')[-1])
-    # await state.set_state(CountState.product_id)
-    # await state.update_data(product_id=product_id)
     product = await Product.get(product_id)
     ikb = make_plus_minus(1, str(product.id))
     await callback.message.delete()
