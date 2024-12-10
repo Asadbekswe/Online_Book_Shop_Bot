@@ -7,6 +7,7 @@ from aiogram.types import Message, FSInputFile
 from aiogram.utils.i18n import gettext as _, lazy_gettext as __
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+from bot.config.conf import db
 from bot.keyboards import show_category, main_buttons, lang_commands, \
     main_links_buttons, make_plus_minus
 from bot.states.count_state import CountState
@@ -19,6 +20,7 @@ main_router = Router()
 @main_router.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
     msg = _('Assalomu alaykum! Tanlovingiz 👇🏻.')
+    print(db['users'])
     user_data = message.from_user.model_dump(include={'id', 'first_name', 'last_name', 'username'})
     if not await User.get_with_telegram_id(telegram_id=message.from_user.id):
         await User.create(first_name=user_data['first_name'], last_name=user_data['last_name'],
@@ -28,7 +30,7 @@ async def command_start_handler(message: Message) -> None:
 
 
 @main_router.message(Command(commands='help'))
-async def help_command(message: Message) -> None:
+async def command_help_handler(message: Message) -> None:
     await message.answer(_('''Buyruqlar:
 /start - Botni ishga tushirish 🫡
 /help - Yordam 📖
@@ -40,7 +42,7 @@ async def change_language(message: Message) -> None:
     await message.answer(_('Tilni tanlang  👇🏻'), reply_markup=lang_commands())
 
 
-@main_router.message(Command(commands=['language']))
+@main_router.message(Command(commands='language'))
 async def language_handler(message: Message) -> None:
     await change_language(message)
 
@@ -67,7 +69,7 @@ async def social_handler(message: Message) -> None:
     await message.answer('Biz ijtimoiy tarmoqlarda', reply_markup=main_links_buttons())
 
 
-@main_router.message(F.text == __('📚 Kitoblar'))
+@main_router.message(F.text == __("📚 Kitoblar"))
 async def books_handler(message: Message) -> None:
     await message.answer(_('Categoriyalardan birini tanlang 👇🏻'),
                          reply_markup=await show_category(message.from_user.id))
@@ -80,7 +82,7 @@ async def back_handler(callback: CallbackQuery):
 
 
 @main_router.message(F.text == __("📞 Biz bilan bog'lanish"))
-async def info_handler(message: Message) -> None:
+async def contact_us_handler(message: Message) -> None:
     text = _(
         """
         \n
@@ -145,3 +147,4 @@ async def product_handler(callback: CallbackQuery):
     # await message.delete()
     await callback.message.answer_photo(photo=FSInputFile(product.image), caption=product.description,
                                         reply_markup=ikb.as_markup())
+

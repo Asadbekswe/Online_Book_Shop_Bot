@@ -19,6 +19,7 @@ def admin_buttons() -> ReplyKeyboardMarkup:
         keyboard=[[KeyboardButton(text='📚 Kitoblar')],
                   [KeyboardButton(text='Product ➕'), KeyboardButton(text='Category ➕')],
                   [KeyboardButton(text="Product ➖ (🗑 o'chirish)"), KeyboardButton(text="Category ➖ (🗑 o'chirish)")]],
+        # [KeyboardButton(text='Social Link ➕'), KeyboardButton(text="Social Link ➖ (🗑 o'chirish)")]],
         resize_keyboard=True)
     return rkb
 

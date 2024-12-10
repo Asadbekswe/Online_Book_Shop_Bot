@@ -9,9 +9,9 @@ from bot.inlinemode import inline_router
 router = Router()
 
 router.include_routers(
+    admin_router,
     main_router,
     inline_router,
     basket_router,
     order_router,
-    admin_router,
 )

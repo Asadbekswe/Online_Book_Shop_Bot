@@ -8,7 +8,6 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import ReplyKeyboardRemove, Message, CallbackQuery, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from bot.config import db
 from bot.filters.is_admin import ChatTypeFilter, IsAdmin
 from bot.keyboards import show_category, admin_buttons
 from db.models import Category, Product
@@ -18,6 +17,7 @@ admin_router.message.filter(ChatTypeFilter([ChatType.PRIVATE]), IsAdmin())
 
 MEDIA_DIRECTORY = './media'
 os.makedirs(MEDIA_DIRECTORY, exist_ok=True)
+
 
 class FormAdministrator(StatesGroup):
     product_title = State()
@@ -36,8 +36,9 @@ class FormAdministrator(StatesGroup):
 
 @admin_router.message(CommandStart())
 async def start_for_admin(message: Message):
+    # user = User.get_with_telegram_id(telegram_id=message.from_user.id)
     await message.answer(
-        f'<i> Assalomu aleykum </i> <b> {message.from_user.full_name} </b> 🫡 Tanlovingiz <tg-spoiler>(Admin)</tg-spoiler> ❕',
+        f'<i> Assalomu aleykum </i> <b> {message.from_user.full_name} </b> 🫡 Tanlovingiz <tg-spoiler>ADMIN</tg-spoiler> ❕',
         reply_markup=admin_buttons())
 
 
@@ -133,7 +134,7 @@ async def add_product_quantity(message: Message, state: FSMContext):
                 callback_data=str(category.id)
             )
         )
-
+    ikb.adjust(2, repeat=True)
     await message.answer('Categoryni tanlang 👇🏻', reply_markup=ikb.as_markup())
 
 
@@ -231,15 +232,3 @@ async def category_delete(callback: CallbackQuery, state: FSMContext) -> None:
         await callback.answer(f"Xatolik yuz berdi: {e}")
     finally:
         await state.clear()
-
-
-# @admin_router.callback_query(FormAdministrator.show_category)
-# async def show_product(callback: CallbackQuery, state: FSMContext):
-#     products = await Product.get_all()
-#     ikb = InlineKeyboardBuilder()
-#     for product in products:
-#         if product.category_id == callback.data:
-#             ikb.add(InlineKeyboardButton(text=product.title, callback_data=str(product.category_id)))
-#     ikb.adjust(2, repeat=True)
-#     await callback.message.edit_text(text="123312312312312312312", reply_markup=ikb.as_markup())
-#     await state.set_state(FormAdministrator.product_delete)

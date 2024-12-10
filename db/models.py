@@ -3,7 +3,7 @@ from enum import Enum
 
 from sqlalchemy import BigInteger, VARCHAR, Column
 from sqlalchemy import Enum as SQLEnum
-from sqlalchemy import Float, SMALLINT, ForeignKey, String, INTEGER, Text
+from sqlalchemy import Float, ForeignKey, String, INTEGER, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.future import select
 from sqlalchemy.orm import mapped_column, Mapped, relationship
@@ -31,6 +31,7 @@ class User(TimeBaseModel):
 class Category(TimeBaseModel):
     name: Mapped[str] = mapped_column(VARCHAR(255))
     products: Mapped[list['Product']] = relationship('Product', back_populates='category')
+
     def __repr__(self):
         return self.name
 
@@ -84,4 +85,3 @@ class Basket(TimeBaseModel):
 
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
     user: Mapped['User'] = relationship('User', back_populates='baskets')
-
