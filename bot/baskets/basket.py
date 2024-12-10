@@ -6,7 +6,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bot.keyboards import show_category, make_plus_minus
 from bot.states.count_state import CountState
-from db import Basket
+from db import Basket, Product
 
 basket_router = Router()
 
@@ -33,16 +33,29 @@ async def to_category(callback: CallbackQuery):
 
 
 @basket_router.callback_query(F.data.startswith('add_to_card_'))
-async def to_basket(callback: CallbackQuery):
+async def to_basket(callback: CallbackQuery, state: FSMContext):
     "add_to_card_{product_id}_{quantity}"
+    # data = (await state.get_data())
+    # print(data['product_id'])
     product_id = callback.data.split('_')[-2]
-    quantity = callback.data.split('_')[-2]
+    quantity = callback.data.split('_')[-1]
+    product = await Product.get(id_=product_id)
+    await Basket.create(
+        order_id=1,
+        product_id=product_id,
+        product_name=product.title,
+        quantity=quantity,
+        price=product.price,
+        user_id=callback.message.from_user.id
+    )
+    print("YARATDIM ASAD AKA")
     await to_category(callback)
 
 
 @basket_router.callback_query((F.data.startswith('change-')) | (F.data.startswith('change+')), CountState.count)
 async def update_page_handler(callback: CallbackQuery, state: FSMContext):
     data = (await state.get_data())
+    # product = await Product.get(id_=data['product_id'])
     if callback.data.startswith("change-"):
         if data['count'] > 1:
             data['count'] -= 1

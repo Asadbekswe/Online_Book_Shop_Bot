@@ -120,10 +120,9 @@ async def contact_us_handler(message: Message) -> None:
 #                                             reply_markup=ikb.as_markup())
 
 @main_router.callback_query(F.data.startswith('category_name_'))
-async def product_handler(callback: CallbackQuery, state: FSMContext):
+async def category_handler(callback: CallbackQuery, state: FSMContext):
     await state.set_state(CountState.count)
     await state.update_data(count=1)
-    print('state!!!')
     category_id = int(callback.data.split('category_name_')[-1])
     categories = await Category.get_all()
     category = next((cat for cat in categories if cat.id == category_id), None)
@@ -140,11 +139,12 @@ async def product_handler(callback: CallbackQuery, state: FSMContext):
 
 
 @main_router.callback_query(F.data.startswith('product_name_'))
-async def product_handler(callback: CallbackQuery):
+async def product_handler(callback: CallbackQuery, state: FSMContext):
     product_id = int(callback.data.split('product_name_')[-1])
+    # await state.set_state(CountState.product_id)
+    # await state.update_data(product_id=product_id)
     product = await Product.get(product_id)
-    ikb = make_plus_minus(1, str(product.uuid))
-    # await message.delete()
+    ikb = make_plus_minus(1, str(product.id))
+    await callback.message.delete()
     await callback.message.answer_photo(photo=FSInputFile(product.image), caption=product.description,
                                         reply_markup=ikb.as_markup())
-

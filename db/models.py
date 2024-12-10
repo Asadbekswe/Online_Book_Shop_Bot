@@ -1,9 +1,9 @@
 import uuid
 from enum import Enum
 
-from sqlalchemy import BigInteger, VARCHAR, Column
+from sqlalchemy import BigInteger, VARCHAR, Column, Integer
 from sqlalchemy import Enum as SQLEnum
-from sqlalchemy import Float, ForeignKey, String, INTEGER, Text
+from sqlalchemy import Float, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.future import select
 from sqlalchemy.orm import mapped_column, Mapped, relationship
@@ -75,13 +75,13 @@ class Order(TimeBaseModel):
 
 
 class Basket(TimeBaseModel):
-    order_id: Mapped[int] = mapped_column(ForeignKey('orders.id'), nullable=False)
-    product_id: Mapped[int] = mapped_column(ForeignKey('products.id'), nullable=False)
+    order_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('orders.id'), nullable=False)
+    product_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('products.id'), nullable=False)
     product_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    quantity: Mapped[int] = mapped_column(INTEGER, nullable=False, default=1)
+    quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     price: Mapped[float] = mapped_column(Float, nullable=False)
     order: Mapped['Order'] = relationship('Order', back_populates='items')
     product: Mapped['Product'] = relationship('Product')
 
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('users.id'), nullable=False)
     user: Mapped['User'] = relationship('User', back_populates='baskets')
