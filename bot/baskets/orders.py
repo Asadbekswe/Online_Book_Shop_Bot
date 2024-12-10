@@ -148,7 +148,7 @@ async def confirm_order(callback: CallbackQuery, bot: Bot):
     try:
         await bot.send_message(
             ADMIN_LIST[0],
-            await order_message(callback.from_user.id, 1) +
+            await order_message(callback.from_user.id) +
             f"\n\nKlient: +{callback.data[12:].replace('r_', '')} <a href='tg://user?id={callback.from_user.id}'>{user_full_name}</a>\nBuyurtmani qabul qilasizmi?",
             parse_mode=ParseMode.HTML,
             reply_markup=ikb
