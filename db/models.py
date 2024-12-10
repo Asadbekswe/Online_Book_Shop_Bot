@@ -75,7 +75,7 @@ class Order(TimeBaseModel):
 
 
 class Basket(TimeBaseModel):
-    order_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('orders.id'), nullable=False)
+    order_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('orders.id'), nullable=True)
     product_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('products.id'), nullable=False)
     product_name: Mapped[str] = mapped_column(String(255), nullable=False)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
