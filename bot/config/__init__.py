@@ -1,1 +1,1 @@
-from bot.config.conf import TOKEN, db, ADMIN_LIST
+from bot.config.conf import TOKEN, ADMIN_LIST
