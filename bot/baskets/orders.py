@@ -186,9 +186,7 @@ async def confirm_order(callback: CallbackQuery, bot: Bot):
 @order_router.callback_query(F.data.startswith('from_admin'))
 async def order_accept_canceled(callback: CallbackQuery, bot: Bot):
     order_id = int(callback.data.split('-')[-1])
-    # order_items = await OrderItem.order
     order = (await Order.get(id_=order_id))
-    # order_quantity = await OrderItem.amount_of_quantity_in_order(order_id=order_id)
     if callback.data.startswith('from_admin_order_accept'):
         for item in await OrderItem.get_products_by_user(user_id=order.user_telegram_id, order_id=order_id):
             product_quantity = (await Product.get(id_=item.product_id)).quantity
@@ -219,22 +217,3 @@ async def my_orders(message: Message):
         await message.answer(_('🤷‍♂️ Sizda hali buyurtmalar mavjud emas. Yoki bekor qilingan'))
     else:
         await message.answer(await order_message(user_telegram_id))
-
-    # @order_router.callback_query(F.data.startswith('from_user_canceled_order'))
-    # async def canceled_order(callback: CallbackQuery, bot: Bot):
-    #     await callback.message.delete()
-    #
-    #     order_num = callback.data.split('from_user_canceled_order')[-1]
-    #     order_num = callback.data.split('from_user_canceled_order')[-1]
-    #     orders[str(callback.from_user.id)].pop(order_num)
-    #     db['orders'] = orders
-    #     await callback.message.answer(f'{order_num} raqamli buyurtmangiz bekor qilindi')
-    #
-    #     try:
-    #         await bot.send_message(
-    #             ADMIN_LIST[0],
-    #             f'{order_num} raqamli buyurtma bekor qilindi\n\nZakaz egasi {callback.from_user.mention_markdown(callback.from_user.full_name)}',
-    #             parse_mode=ParseMode.MARKDOWN_V2
-    #         )
-    #     except TelegramBadRequest as e:
-    #         print(f"Failed to send message to admin. Reason: {e}")

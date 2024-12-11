@@ -141,14 +141,6 @@ class AbstractClass:
             count = result.scalar_one_or_none()
         return count if count else 0
 
-    # @classmethod
-    # async def amount_of_quantity_in_order(cls, order_id):
-    #     query = (
-    #         sqlalchemy.select(sqlalchemy.func.sum(cls.quantity))
-    #         .where(cls.order_id == order_id)
-    #     )
-    #     return (await db.execute(query)).scalar()
-
     @classmethod
     async def get_all(cls):
         return (await db.execute(select(cls))).scalars()

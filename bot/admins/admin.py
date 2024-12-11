@@ -36,7 +36,6 @@ class FormAdministrator(StatesGroup):
 
 @admin_router.message(CommandStart())
 async def start_for_admin(message: Message):
-    # user = User.get_with_telegram_id(telegram_id=message.from_user.id)
     await message.answer(
         f'<i> Assalomu aleykum </i> <b> {message.from_user.full_name} </b> 🫡 Tanlovingiz <tg-spoiler>ADMIN</tg-spoiler> ❕',
         reply_markup=admin_buttons())
@@ -71,10 +70,6 @@ async def add_category(message: Message, state: FSMContext) -> None:
 
 @admin_router.message(F.text == 'Product ➕')
 async def add_product(message: Message, state: FSMContext):
-    # categories = await Category.get_all() XATOLIKNI TEKSHIRING
-    # if not categories:
-    #     await message.answer("Product qo'shishdan avval Category kiritish zarur ⁉️")
-    #     return
     await state.set_state(FormAdministrator.product_title)
     await message.answer('Product nomini kiriting 👇🏻', reply_markup=ReplyKeyboardRemove())
 
