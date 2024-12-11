@@ -98,18 +98,20 @@ class AbstractClass:
             return (await db.execute(query)).scalars()
 
     @classmethod
-    async def get_uuid(cls, uuid):
-        query = select(cls).where(cls.uuid == uuid)
-        return (await db.execute(query)).scalar()
-
-    @classmethod
-    async def get_products_by_user(cls, user_id):
+    async def get_products_by_user(cls, user_id, order_id=None):
         async with db._session as session:
-            query = (
-                sqlalchemy.select(cls)
-                .options(selectinload(cls.product))
-                .where(cls.user_telegram_id == user_id)
-            )
+            if user_id and order_id:
+                query = (
+                    sqlalchemy.select(cls)
+                    .options(selectinload(cls.product))
+                    .where(cls.user_telegram_id == user_id, cls.order_id == order_id)
+                )
+            else:
+                query = (
+                    sqlalchemy.select(cls)
+                    .options(selectinload(cls.product))
+                    .where(cls.user_telegram_id == user_id)
+                )
             result = await session.execute(query)
             return result.scalars().all()
 
@@ -138,6 +140,14 @@ class AbstractClass:
             result = await session.execute(query)
             count = result.scalar_one_or_none()
         return count if count else 0
+
+    # @classmethod
+    # async def amount_of_quantity_in_order(cls, order_id):
+    #     query = (
+    #         sqlalchemy.select(sqlalchemy.func.sum(cls.quantity))
+    #         .where(cls.order_id == order_id)
+    #     )
+    #     return (await db.execute(query)).scalar()
 
     @classmethod
     async def get_all(cls):

@@ -97,30 +97,6 @@ async def contact_us_handler(message: Message) -> None:
     await message.answer(text=text, parse_mode=ParseMode.HTML)
 
 
-# @main_router.callback_query()
-# async def product_handler(callback: CallbackQuery):
-#     categories = await Category.get_all()
-#     cat_ids = [i.id for i in categories]
-#     category = next((cat for cat in categories if cat.id == int(callback.data)), None)
-#     products = await Product.get_products_by_category_id(category_id=int(callback.data))
-#     if int(callback.data) in cat_ids:
-#         ikb = InlineKeyboardBuilder()
-#         for product in products:
-#             ikb.add(InlineKeyboardButton(text=product.title, callback_data=str(product.id)))
-#         if str(callback.from_user.id) in db['baskets']:
-#             ikb.add(InlineKeyboardButton(text=f'🛒 Savat ({len(db["baskets"][str(callback.from_user.id)])})',
-#                                          callback_data='savat'))
-#         ikb.add(InlineKeyboardButton(text=_("◀️ orqaga"), callback_data='orqaga'))
-#         ikb.adjust(2, repeat=True)
-#
-#         await callback.message.edit_text(text=f"{category.name}", reply_markup=ikb.as_markup())
-#     elif callback.data in db['products']:
-#         product = db['products'][callback.data]
-#         ikb = make_plus_minus(1, callback.data)
-#         await callback.message.delete()
-#         await callback.message.answer_photo(photo=product.image, caption=product.title,
-#                                             reply_markup=ikb.as_markup())
-
 @main_router.callback_query(F.data.startswith('category_name_'))
 async def category_handler(callback: CallbackQuery, state: FSMContext):
     await state.set_state(CountState.count)

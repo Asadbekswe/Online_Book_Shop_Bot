@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from aiogram import F, Router, Bot
 from aiogram.enums import ContentType, ParseMode
 from aiogram.exceptions import TelegramBadRequest
@@ -11,9 +9,9 @@ from aiogram.utils.i18n import gettext as _, lazy_gettext as __
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bot.baskets import to_category, basket_msg
-from bot.config import db, ADMIN_LIST
+from bot.config import ADMIN_LIST
 from bot.keyboards import main_buttons
-from db import Basket, User, Order
+from db import Basket, User, Order, Product
 from db.models import OrderItem
 
 order_router = Router()
@@ -24,25 +22,27 @@ class BasketState(StatesGroup):
 
 
 async def order_message(user_id):
+    all_sum = 0
+    msg = ''
     orders = await Order.get(user_telegram_id=user_id)
     for order in orders:
-        msg = _(
+        msg += _(
             '🔢 Buyurtma raqami: <b>{order_id}</b>\n'
             '📆 Buyurtma qilingan sana: <b>{date_time}</b>\n'
-            '🟣 Buyurtma holati: <b>{order_status}</b>\n').format(
+            '🟣 Buyurtma holati: <b>{order_status}</b>\n\n').format(
             order_id=order.id,
             date_time=str(order.created_at.strftime('%Y-%m-%d %H:%M:%S')),
-            order_status=order.order_status
+            order_status=order.order_status.value
         )
-        order_items = await OrderItem.get_products_by_user(user_id=order.user_telegram_id)
-        all_sum = 0
-        i = 0
+        order_items = await OrderItem.get_products_by_user(user_id=order.user_telegram_id, order_id=order.id)
+        i = 1
+        summa = 0
         for item in order_items:
-            summa = int(item.quantity) * int(item.product.price)
-            msg += f'\n{1 + i}. 📕 Kitob nomi: {item.product.title} \n{item.product.quantity} x {item.product.price} = {str(summa)} sum\n'
+            summa += int(item.quantity) * int(item.product.price)
+            msg += f'\n{i}. 📕 Kitob nomi: {item.product.title} \n{item.quantity} x {item.product.price} = {str(int(item.quantity) * int(item.product.price))} sum\n\n'
             i += 1
-            all_sum += summa
-
+        all_sum += summa
+        msg += '~~~~~~~~~~~~~~~~~~~~~~~~~\n'
     msg += f'\n💸 Umumiy narxi: {all_sum} sum'
     return msg
 
@@ -108,7 +108,8 @@ async def canceled_order(callback: CallbackQuery):
 
 @order_router.callback_query(F.data.startswith('confirm_order'))
 async def confirm_order(callback: CallbackQuery, bot: Bot):
-    # await callback.message.delete()
+    summa = 0
+    msg = ''
     total_amount = float(callback.message.text.split("Jami: ")[-1].split()[0])
     phone_number = callback.data.split("confirm_order_")[-1]
     order = await Order.create(
@@ -125,16 +126,32 @@ async def confirm_order(callback: CallbackQuery, bot: Bot):
             product_id=orderitem.product_id,
 
         )
+    msg += _(
+        '🔢 Buyurtma raqami: <b>{order_id}</b>\n'
+        '📆 Buyurtma qilingan sana: <b>{date_time}</b>\n'
+        '🟣 Buyurtma holati: <b>{order_status}</b>\n\n').format(
+        order_id=order.id,
+        date_time=str(order.created_at.strftime('%Y-%m-%d %H:%M:%S')),
+        order_status=order.order_status.value
+    )
+    order_items = await OrderItem.get_products_by_user(user_id=order.user_telegram_id, order_id=order.id)
+    i = 1
+    for item in order_items:
+        summa += int(item.quantity) * int(item.product.price)
+        msg += f'\n{i}. 📕 Kitob nomi: {item.product.title} \n{item.quantity} x {item.product.price} = {str(int(item.quantity) * int(item.product.price))} sum\n\n'
+        i += 1
+    msg += '~~~~~~~~~~~~~~~~~~~~~~~~~\n'
+    msg += f'\n💸 Umumiy narxi: {summa} sum'
     user_telegram_id = callback.from_user.id
     ikb = InlineKeyboardMarkup(inline_keyboard=[
         [
             InlineKeyboardButton(
                 text=_("❌ Yo'q"),
-                callback_data=f'from_admin_canceled_order-{user_telegram_id}'
+                callback_data=f'from_admin_canceled_order-{user_telegram_id}-{order.id}'
             ),
             InlineKeyboardButton(
                 text=_('✅ Ha'),
-                callback_data=f'from_admin_order_accept-{user_telegram_id}'
+                callback_data=f'from_admin_order_accept-{user_telegram_id}-{order.id}'
             )
         ]
     ])
@@ -148,8 +165,8 @@ async def confirm_order(callback: CallbackQuery, bot: Bot):
     try:
         await bot.send_message(
             ADMIN_LIST[0],
-            await order_message(callback.from_user.id) +
-            f"\n\nKlient: +{callback.data[12:].replace('r_', '')} <a href='tg://user?id={callback.from_user.id}'>{user_full_name}</a>\nBuyurtmani qabul qilasizmi?",
+            msg +
+            f"\n\nKlient: {callback.data[12:].replace('r_', '')} <a href='tg://user?id={callback.from_user.id}'>{user_full_name}</a>\nBuyurtmani qabul qilasizmi?",
             parse_mode=ParseMode.HTML,
             reply_markup=ikb
         )
@@ -158,7 +175,7 @@ async def confirm_order(callback: CallbackQuery, bot: Bot):
 
     await callback.message.answer(
         _('✅ Hurmatli mijoz! Buyurtmangiz uchun tashakkur.\nBuyurtma raqami: {orders_num}').format(
-            orders_num=0
+            orders_num=order.id
         ),
         reply_markup=main_buttons()
     )
@@ -168,19 +185,30 @@ async def confirm_order(callback: CallbackQuery, bot: Bot):
 
 @order_router.callback_query(F.data.startswith('from_admin'))
 async def order_accept_canceled(callback: CallbackQuery, bot: Bot):
-    user_order = callback.data.split('-')[1:]
-    # orders = db['orders']
-    # users_orders = orders[user_order[0]]
+    order_id = int(callback.data.split('-')[-1])
+    # order_items = await OrderItem.order
+    order = (await Order.get(id_=order_id))
+    # order_quantity = await OrderItem.amount_of_quantity_in_order(order_id=order_id)
     if callback.data.startswith('from_admin_order_accept'):
-        d = '✅ Zakaz qabul qilingan'
-        await bot.send_message(user_order[0],
-                               _('<i>🎉 Sizning {order_num} raqamli buyurtmangizni admin qabul qildi.</i>').format(
-                                   order_num=1))
+        for item in await OrderItem.get_products_by_user(user_id=order.user_telegram_id, order_id=order_id):
+            product_quantity = (await Product.get(id_=item.product_id)).quantity
+            await Product.update(
+                id_=item.product_id,
+                quantity=(product_quantity - item.quantity)
+            )
+
+        await bot.send_message(chat_id=callback.message.chat.id,
+                               text=('<i>🎉 Sizning {order_num} raqamli buyurtmangizni admin qabul qildi.</i>').format(
+                                   order_num=order_id))
+
         await callback.message.edit_reply_markup()
+    elif callback.data.startswith('from_admin_canceled_order'):
+        await bot.send_message(chat_id=callback.message.chat.id,
+                               text=(
+                                   '<i>❌ Sizning {order_num} raqamli buyurtmangizni admin Tomonidan bekor qilindi !!!.</i>').format(
+                                   order_num=order_id))
     else:
         await callback.message.delete()
-        # users_orders.pop(user_order[1])
-    # db['orders'] = orders
 
 
 @order_router.message(F.text == __('📃 Mening buyurtmalarim'))
@@ -190,28 +218,23 @@ async def my_orders(message: Message):
     if not orders:
         await message.answer(_('🤷‍♂️ Sizda hali buyurtmalar mavjud emas. Yoki bekor qilingan'))
     else:
-    #     for order in orders:
-    #         ikb = InlineKeyboardMarkup(inline_keyboard=[
-    #             [InlineKeyboardButton(text=_('❌ bekor qilish'),
-    #                                   callback_data='from_user_canceled_order' + str(order.id))]
-    #         ])
-            await message.answer(await order_message(user_telegram_id))
+        await message.answer(await order_message(user_telegram_id))
 
-
-# @order_router.callback_query(F.data.startswith('from_user_canceled_order'))
-# async def canceled_order(callback: CallbackQuery, bot: Bot):
-#     await callback.message.delete()
-#     orders = db['orders']
-#     order_num = callback.data.split('from_user_canceled_order')[-1]
-#     orders[str(callback.from_user.id)].pop(order_num)
-#     db['orders'] = orders
-#     await callback.message.answer(f'{order_num} raqamli buyurtmangiz bekor qilindi')
-#
-#     try:
-#         await bot.send_message(
-#             ADMIN_LIST[0],
-#             f'{order_num} raqamli buyurtma bekor qilindi\n\nZakaz egasi {callback.from_user.mention_markdown(callback.from_user.full_name)}',
-#             parse_mode=ParseMode.MARKDOWN_V2
-#         )
-#     except TelegramBadRequest as e:
-#         print(f"Failed to send message to admin. Reason: {e}")
+    # @order_router.callback_query(F.data.startswith('from_user_canceled_order'))
+    # async def canceled_order(callback: CallbackQuery, bot: Bot):
+    #     await callback.message.delete()
+    #
+    #     order_num = callback.data.split('from_user_canceled_order')[-1]
+    #     order_num = callback.data.split('from_user_canceled_order')[-1]
+    #     orders[str(callback.from_user.id)].pop(order_num)
+    #     db['orders'] = orders
+    #     await callback.message.answer(f'{order_num} raqamli buyurtmangiz bekor qilindi')
+    #
+    #     try:
+    #         await bot.send_message(
+    #             ADMIN_LIST[0],
+    #             f'{order_num} raqamli buyurtma bekor qilindi\n\nZakaz egasi {callback.from_user.mention_markdown(callback.from_user.full_name)}',
+    #             parse_mode=ParseMode.MARKDOWN_V2
+    #         )
+    #     except TelegramBadRequest as e:
+    #         print(f"Failed to send message to admin. Reason: {e}")

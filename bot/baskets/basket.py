@@ -49,7 +49,6 @@ async def to_basket(callback: CallbackQuery):
 @basket_router.callback_query((F.data.startswith('change-')) | (F.data.startswith('change+')), CountState.count)
 async def update_page_handler(callback: CallbackQuery, state: FSMContext):
     data = (await state.get_data())
-    # product = await Product.get(id_=data['product_id'])
     if callback.data.startswith("change-"):
         if data['count'] > 1:
             data['count'] -= 1
@@ -58,8 +57,14 @@ async def update_page_handler(callback: CallbackQuery, state: FSMContext):
             await callback.answer(_('Eng kamida 1 ta kitob buyurtma qilishingiz mumkin! 😊'), show_alert=True)
             return
     else:
-        data['count'] += 1
-        await state.update_data(count=data['count'])
+        product = await Product.get(id_=int(callback.data.split('+')[-1]))
+        if product.quantity <= data['count']:
+            await callback.answer(_('Ayni vaqtda bu kitobdan shuncha {product_count} miqdorda mavjud! 😊').format(
+                product_count=data['count']), show_alert=True)
+            return
+        else:
+            data['count'] += 1
+            await state.update_data(count=data['count'])
     ikb = make_plus_minus(data['count'], callback.data[7:])
     await callback.message.edit_reply_markup(str(callback.message.message_id), reply_markup=ikb.as_markup())
 
