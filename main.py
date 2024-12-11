@@ -14,13 +14,11 @@ from bot.utils.starter import router
 from db import database
 
 dp = Dispatcher()
-WEB_SERVER_HOST = "localhost"
+WEB_SERVER_HOST = "127.0.0.1"
 WEB_SERVER_PORT = 8080  # Changed from 80 to 8080
 WEBHOOK_PATH = "/webhook"
 BASE_WEBHOOK_URL = "https://jasur.fil.uz"
 
-
-# https://api.telegram.org/bot7846660611:AAHwswuQVcpyT_cQaVX3p5LOkneBzrZkXV4/setWebhook?url=https://e557-178-218-201-17.ngrok-free.app/bot
 
 async def on_startup(bot: Bot):
     logging.info("Starting up...")
