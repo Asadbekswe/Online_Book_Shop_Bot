@@ -17,7 +17,7 @@ dp = Dispatcher()
 
 async def on_startup(bot: Bot):
     # await database.drop_all()
-    # await database.create_all()
+    await database.create_all()
     command_list = [
         BotCommand(command='start', description='Start the bot 🫡'),
         BotCommand(command='help', description='Help 📖'),
