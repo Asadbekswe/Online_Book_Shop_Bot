@@ -93,7 +93,8 @@ async def phone_number(message: Message, state: FSMContext):
     ikb = InlineKeyboardBuilder()
     ikb.row(
         InlineKeyboardButton(text=_("❌ Yo'q"), callback_data='canceled_order'),
-        InlineKeyboardButton(text=_('✅ Ha'), callback_data=f'confirm_order_{message.contact.phone_number}')
+        InlineKeyboardButton(text=_('✅ Ha'),
+                             callback_data=f'confirm_order_{int(message.from_user.id)}_{message.contact.phone_number}')
     )
 
     await message.answer(msg, reply_markup=ikb.as_markup())
@@ -111,7 +112,8 @@ async def confirm_order(callback: CallbackQuery, bot: Bot):
     summa = 0
     msg = ''
     total_amount = float(callback.message.text.split("Jami: ")[-1].split()[0])
-    phone_number = callback.data.split("confirm_order_")[-1]
+    phone_number = callback.data.split("_")[-1]
+    user_id = callback.data.split("_")[-2]
     order = await Order.create(
         user_telegram_id=callback.from_user.id,
         phone_number=phone_number,
@@ -147,11 +149,11 @@ async def confirm_order(callback: CallbackQuery, bot: Bot):
         [
             InlineKeyboardButton(
                 text=_("❌ Yo'q"),
-                callback_data=f'from_admin_canceled_order-{user_telegram_id}-{order.id}'
+                callback_data=f'from_admin_canceled_order-{user_telegram_id}-{user_id}-{order.id}'
             ),
             InlineKeyboardButton(
                 text=_('✅ Ha'),
-                callback_data=f'from_admin_order_accept-{user_telegram_id}-{order.id}'
+                callback_data=f'from_admin_order_accept-{user_telegram_id}-{user_id}-{order.id}'
             )
         ]
     ])
@@ -186,6 +188,7 @@ async def confirm_order(callback: CallbackQuery, bot: Bot):
 @order_router.callback_query(F.data.startswith('from_admin'))
 async def order_accept_canceled(callback: CallbackQuery, bot: Bot):
     order_id = int(callback.data.split('-')[-1])
+    user_telegram_id = int(callback.data.split('-')[-2])
     order = (await Order.get(id_=order_id))
     if callback.data.startswith('from_admin_order_accept'):
         for item in await OrderItem.get_products_by_user(user_id=order.user_telegram_id, order_id=order_id):
@@ -195,7 +198,7 @@ async def order_accept_canceled(callback: CallbackQuery, bot: Bot):
                 quantity=(product_quantity - item.quantity)
             )
 
-        await bot.send_message(chat_id=callback.message.chat.id,
+        await bot.send_message(chat_id=user_telegram_id,
                                text=('<i>🎉 Sizning {order_num} raqamli buyurtmangizni admin qabul qildi.</i>').format(
                                    order_num=order_id))
 
