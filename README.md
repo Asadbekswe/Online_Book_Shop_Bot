@@ -1,4 +1,4 @@
-# Online Book Shop BOT 
+# Book Shop BOT 
 
 
 ![aiogram](https://img.shields.io/badge/python-v3.12-blue.svg?logo=python&logoColor=yellow) ![aiogram](https://img.shields.io/badge/aiogram-v3-blue.svg?logo=telegram) ![Redis](https://img.shields.io/badge/redis-dictionary--storage-red.svg?logo=redis)
