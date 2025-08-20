@@ -75,11 +75,11 @@ To get started with this bot, follow these steps:
 
 - Run the bot using(bash or shell)
     ```bash
-    python3 main.py
+    python3 main_polling.py
    ```
     ```bash
-    chmod +x main.py
-   ./main.py
+    chmod +x main_polling.py
+   ./main_polling.py
    ```
 
 <div style="text-align: center;">

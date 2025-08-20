@@ -22,7 +22,6 @@ BASE_WEBHOOK_URL = "https://jasur.fil.uz"
 
 async def on_startup(bot: Bot):
     logging.info("Starting up...")
-    # Initialize database
     await database.create_all()
 
     # Set bot commands
